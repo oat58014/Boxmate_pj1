@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ShoppingCart,
   Search,
@@ -14,6 +14,8 @@ import Header from "../main_header";
 export default function Order() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const statusFilters = [
     { id: "all", label: "ทั้งหมด" },
@@ -24,80 +26,113 @@ export default function Order() {
     { id: "cancelled", label: "ยกเลิก" },
   ];
 
-  const orderData = [
-    {
-      id: "ORD001",
-      customer: "สมชาย ใจดี",
-      items: 3,
-      total: "฿2,450",
-      status: "pending",
-      date: "12/02/2026 14:30",
-      address: "123 ถนนสุขุมวิท กรุงเทพฯ 10110",
-    },
-    {
-      id: "ORD002",
-      customer: "สมหญิง มีสุข",
-      items: 1,
-      total: "฿35,900",
-      status: "processing",
-      date: "12/02/2026 13:15",
-      address: "456 ถนนพระราม 4 กรุงเทพฯ 10500",
-    },
-    {
-      id: "ORD003",
-      customer: "ประยุทธ์ รักดี",
-      items: 5,
-      total: "฿8,750",
-      status: "shipping",
-      date: "11/02/2026 16:45",
-      address: "789 ถนนรัชดาภิเษก กรุงเทพฯ 10400",
-    },
-    {
-      id: "ORD004",
-      customer: "วิไล สวยงาม",
-      items: 2,
-      total: "฿1,290",
-      status: "completed",
-      date: "11/02/2026 10:20",
-      address: "321 ถนนพหลโยธิน กรุงเทพฯ 10220",
-    },
-    {
-      id: "ORD005",
-      customer: "มานะ ขยัน",
-      items: 4,
-      total: "฿15,600",
-      status: "completed",
-      date: "10/02/2026 09:10",
-      address: "654 ถนนเพชรบุรี กรุงเทพฯ 10400",
-    },
-    {
-      id: "ORD006",
-      customer: "สมศรี ดีมาก",
-      items: 1,
-      total: "฿890",
-      status: "cancelled",
-      date: "10/02/2026 15:30",
-      address: "987 ถนนศรีนครินทร์ กรุงเทพฯ 10250",
-    },
-    {
-      id: "ORD007",
-      customer: "ทศพล เก่งการ",
-      items: 6,
-      total: "฿4,320",
-      status: "shipping",
-      date: "12/02/2026 11:00",
-      address: "147 ถนนลาดพร้าว กรุงเทพฯ 10230",
-    },
-    {
-      id: "ORD008",
-      customer: "จันทร์เพ็ญ แจ่มใส",
-      items: 2,
-      total: "฿6,780",
-      status: "pending",
-      date: "12/02/2026 15:45",
-      address: "258 ถนนงามวงศ์วาน กรุงเทพฯ 10900",
-    },
+  // stock/order data — will be populated from API; keep an empty array initially
+  const [orderData, setOrderData] = useState([]);
+
+  // fallback addresses for randomization
+  const sampleAddresses = [
+    "123 ถนนสุขุมวิท กรุงเทพฯ 10110",
+    "456 ถนนพระราม 4 กรุงเทพฯ 10500",
+    "789 ถนนรัชดาภิเษก กรุงเทพฯ 10400",
+    "321 ถนนพหลโยธิน กรุงเทพฯ 10220",
+    "654 ถนนเพชรบุรี กรุงเทพฯ 10400",
+    "987 ถนนศรีนครินทร์ กรุงเทพฯ 10250",
+    "147 ถนนลาดพร้าว กรุงเทพฯ 10230",
+    "258 ถนนงามวงศ์วาน กรุงเทพฯ 10900",
   ];
+
+  useEffect(() => {
+    const ac = new AbortController();
+    async function loadOrders() {
+      try {
+        setLoading(true);
+        setError(null);
+        // TODO: Add auth header if API requires it (uncomment and add token):
+        // headers: { Authorization: 'Bearer YOUR_TOKEN' }
+        const res = await fetch("https://30cc-124-122-9-179.ngrok-free.app/api/orders", { 
+          signal: ac.signal,
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            // "Authorization": "Bearer YOUR_TOKEN_HERE"
+          }
+        });
+        if (!res.ok) throw new Error("Failed to fetch orders");
+        
+        const contentType = res.headers.get("content-type") || "";
+        let data;
+        if (contentType.includes("application/json")) {
+          try {
+            data = await res.json();
+          } catch (e) {
+            const text = await res.text();
+            throw new Error("Invalid JSON response: " + (text ? text.slice(0, 200) : "(empty)"));
+          }
+        } else {
+          const text = await res.text();
+          console.error("❌ API returned HTML, not JSON. Response preview:", text.slice(0, 300));
+          throw new Error(
+            `API returned ${contentType || "text/html"} instead of JSON. Check browser console for details. May need auth header.`
+          );
+        }
+
+        if (!Array.isArray(data)) {
+          if (data && Array.isArray(data.data)) {
+            data = data.data;
+          } else {
+            setOrderData([]);
+            return;
+          }
+        }
+
+        const mapped = data.map((o) => {
+          const items = Math.floor(Math.random() * 6) + 1;
+          const address = sampleAddresses[Math.floor(Math.random() * sampleAddresses.length)];
+          const dt = o.created_at ? new Date(o.created_at) : null;
+          const thaiDate = dt ? dt.toLocaleString("th-TH", { timeZone: "Asia/Bangkok", hour12: false }) : null;
+          
+          // map API status to UI status
+          const statusMap = {
+            "packed": "processing",
+            "ready_to_ship": "shipping",
+            "delivered": "completed",
+            "canceled": "cancelled",
+            "CANCELLED": "cancelled",
+            "unpaid": "pending",
+            "pending": "pending",
+            "processing": "processing",
+            "shipping": "shipping",
+            "completed": "completed",
+            "cancelled": "cancelled",
+          };
+          
+          return {
+            id: o.order_id || null,
+            customer: o.customer_name || null,
+            items,
+            total: o.amount !== undefined && o.amount !== null ? `฿${Number(o.amount).toLocaleString("th-TH")}` : null,
+            status: statusMap[o.status] || o.status || "pending",
+            date: thaiDate,
+            address,
+            platform: o.platform || null,
+          };
+        });
+
+        setOrderData(mapped);
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          // fetch was aborted by cleanup; ignore
+          return;
+        }
+        console.error(err);
+        setOrderData([]);
+        setError(err.message || String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadOrders();
+    return () => ac.abort();
+  }, []);
 
   const filteredOrders =
     selectedStatus === "all"
@@ -138,13 +173,16 @@ export default function Order() {
       },
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[status] || {
+      bg: "bg-gray-100",
+      text: "text-gray-700",
+      label: status || "ไม่ระบุ",
+      icon: Package,
+    };
     const Icon = config.icon;
 
     return (
-      <span
-        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}
-      >
+      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
         <Icon className="w-3 h-3" />
         {config.label}
       </span>
@@ -294,6 +332,17 @@ export default function Order() {
               </div>
             </div>
 
+            {/* Loading / Error / Empty states */}
+            {loading && (
+              <div className="mb-4 p-4 bg-blue-50 text-blue-700 rounded">กำลังโหลดคำสั่งซื้อ...</div>
+            )}
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 text-red-700 rounded">ข้อผิดพลาด: {error}</div>
+            )}
+            {!loading && !error && orderData.length === 0 && (
+              <div className="mb-4 p-4 bg-yellow-50 text-yellow-700 rounded">ไม่มีคำสั่งซื้อ</div>
+            )}
+
             {/* Orders Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="overflow-x-auto">
@@ -311,6 +360,9 @@ export default function Order() {
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
                         ยอดรวม
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                        แพลตฟอร์ม
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
                         สถานะ
@@ -347,6 +399,9 @@ export default function Order() {
                         </td>
                         <td className="py-3 px-4 text-sm font-semibold text-gray-800">
                           {order.total}
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600">
+                          {order.platform === null || order.platform === undefined ? 'null' : order.platform}
                         </td>
                         <td className="py-3 px-4">
                           {getStatusBadge(order.status)}

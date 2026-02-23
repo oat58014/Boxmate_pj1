@@ -40,13 +40,15 @@ export default function Analytics() {
       setError(null);
       try {
         // adjust endpoint to your backend API
-        const res = await fetch('/api/dashboard', { signal: ac.signal });
-        if (!res.ok) throw new Error('Failed to load dashboard');
+        const res = await fetch("https://30cc-124-122-9-179.ngrok-free.app/api/orders", {
+          signal: ac.signal,
+        });
+        if (!res.ok) throw new Error("Failed to load dashboard");
         const json = await res.json();
         // expected json shape: { metrics, userBehavior, trafficSources, topPerformers, packageDistribution, satisfaction, weeklyTrends }
         setDashboardData(json || null);
       } catch (err) {
-        if (err.name !== 'AbortError') setError(err.message || String(err));
+        if (err.name !== "AbortError") setError(err.message || String(err));
         setDashboardData(null);
       } finally {
         setLoading(false);
@@ -88,30 +90,78 @@ export default function Analytics() {
               {(() => {
                 const metrics = dashboardData?.metrics;
                 const items = metrics || [
-                  { id: 1, icon: Target, title: 'Conversion Rate', value: null, change: null },
-                  { id: 2, icon: DollarSign, title: 'Average Revenue', value: null, change: null },
-                  { id: 3, icon: Activity, title: 'Response Time', value: null, change: null },
-                  { id: 4, icon: Zap, title: 'Efficiency Score', value: null, change: null },
+                  {
+                    id: 1,
+                    icon: Target,
+                    title: "Conversion Rate",
+                    value: null,
+                    change: null,
+                  },
+                  {
+                    id: 2,
+                    icon: DollarSign,
+                    title: "Average Revenue",
+                    value: null,
+                    change: null,
+                  },
+                  {
+                    id: 3,
+                    icon: Activity,
+                    title: "Response Time",
+                    value: null,
+                    change: null,
+                  },
+                  {
+                    id: 4,
+                    icon: Zap,
+                    title: "Efficiency Score",
+                    value: null,
+                    change: null,
+                  },
                 ];
                 return items.map((m, i) => {
                   const Icon = m.icon || Target;
-                  const change = m.change === undefined || m.change === null ? null : m.change;
+                  const change =
+                    m.change === undefined || m.change === null
+                      ? null
+                      : m.change;
                   const changeNum = parseTrend(change);
                   const changeUp = changeNum > 0;
                   return (
-                    <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div
+                      key={i}
+                      className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+                    >
                       <div className="flex items-center justify-between mb-4">
                         <div className="bg-blue-100 p-3 rounded-lg">
                           <Icon className="w-6 h-6 text-blue-600" />
                         </div>
-                        <span className={`${changeNum >= 0 ? 'text-green-600' : 'text-red-600'} text-sm font-semibold flex items-center gap-1`}>
-                          {changeNum > 0 ? <TrendingUp className="w-4 h-4" /> : changeNum < 0 ? <TrendingDown className="w-4 h-4" /> : <span className="w-4 h-4 inline-block" />}
-                          {change === null || change === undefined ? 'null' : String(change)}
+                        <span
+                          className={`${changeNum >= 0 ? "text-green-600" : "text-red-600"} text-sm font-semibold flex items-center gap-1`}
+                        >
+                          {changeNum > 0 ? (
+                            <TrendingUp className="w-4 h-4" />
+                          ) : changeNum < 0 ? (
+                            <TrendingDown className="w-4 h-4" />
+                          ) : (
+                            <span className="w-4 h-4 inline-block" />
+                          )}
+                          {change === null || change === undefined
+                            ? "null"
+                            : String(change)}
                         </span>
                       </div>
-                      <p className="text-gray-500 text-sm font-medium">{m.title}</p>
-                      <p className="text-2xl font-bold text-gray-800 mt-1">{m.value === null || m.value === undefined ? 'null' : m.value}</p>
-                      <p className="text-xs text-gray-400 mt-2">เทียบกับเดือนที่แล้ว</p>
+                      <p className="text-gray-500 text-sm font-medium">
+                        {m.title}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-800 mt-1">
+                        {m.value === null || m.value === undefined
+                          ? "null"
+                          : m.value}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        เทียบกับเดือนที่แล้ว
+                      </p>
                     </div>
                   );
                 });
@@ -129,19 +179,42 @@ export default function Analytics() {
                   {(() => {
                     const ub = dashboardData?.userBehavior;
                     const list = ub || [
-                      { label: 'รับพัสดุ', value: null, color: 'bg-blue-500' },
-                      { label: 'ตรวจสอบสถานะ', value: null, color: 'bg-green-500' },
-                      { label: 'แจ้งปัญหา', value: null, color: 'bg-yellow-500' },
-                      { label: 'ติดต่อเจ้าหน้าที่', value: null, color: 'bg-purple-500' },
+                      { label: "รับพัสดุ", value: null, color: "bg-blue-500" },
+                      {
+                        label: "ตรวจสอบสถานะ",
+                        value: null,
+                        color: "bg-green-500",
+                      },
+                      {
+                        label: "แจ้งปัญหา",
+                        value: null,
+                        color: "bg-yellow-500",
+                      },
+                      {
+                        label: "ติดต่อเจ้าหน้าที่",
+                        value: null,
+                        color: "bg-purple-500",
+                      },
                     ];
                     return list.map((item, index) => (
                       <div key={index}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">{item.label}</span>
-                          <span className="text-sm font-semibold text-gray-800">{item.value === null || item.value === undefined ? 'null' : `${item.value}%`}</span>
+                          <span className="text-sm font-medium text-gray-700">
+                            {item.label}
+                          </span>
+                          <span className="text-sm font-semibold text-gray-800">
+                            {item.value === null || item.value === undefined
+                              ? "null"
+                              : `${item.value}%`}
+                          </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className={`${item.color} h-2 rounded-full transition-all`} style={{ width: `${item.value === null || item.value === undefined ? 0 : item.value}%` }}></div>
+                          <div
+                            className={`${item.color} h-2 rounded-full transition-all`}
+                            style={{
+                              width: `${item.value === null || item.value === undefined ? 0 : item.value}%`,
+                            }}
+                          ></div>
                         </div>
                       </div>
                     ));
@@ -158,25 +231,63 @@ export default function Analytics() {
                   {(() => {
                     const ts = dashboardData?.trafficSources;
                     const list = ts || [
-                      { source: 'Direct', users: null, percentage: null, trend: null },
-                      { source: 'Social Media', users: null, percentage: null, trend: null },
-                      { source: 'Email', users: null, percentage: null, trend: null },
-                      { source: 'Referral', users: null, percentage: null, trend: null },
+                      {
+                        source: "Direct",
+                        users: null,
+                        percentage: null,
+                        trend: null,
+                      },
+                      {
+                        source: "Social Media",
+                        users: null,
+                        percentage: null,
+                        trend: null,
+                      },
+                      {
+                        source: "Email",
+                        users: null,
+                        percentage: null,
+                        trend: null,
+                      },
+                      {
+                        source: "Referral",
+                        users: null,
+                        percentage: null,
+                        trend: null,
+                      },
                     ];
                     return list.map((item, index) => {
                       const trendNum = parseTrend(item.trend);
                       const trendUp = trendNum > 0;
                       return (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        >
                           <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-800">{item.source}</p>
-                            <p className="text-xs text-gray-500">{item.users === null || item.users === undefined ? 'null' : `${item.users} users`}</p>
+                            <p className="text-sm font-semibold text-gray-800">
+                              {item.source}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {item.users === null || item.users === undefined
+                                ? "null"
+                                : `${item.users} users`}
+                            </p>
                           </div>
                           <div className="flex items-center gap-4">
                             <div className="text-right">
-                              <p className="text-sm font-bold text-gray-800">{item.percentage === null || item.percentage === undefined ? 'null' : `${item.percentage}%`}</p>
-                              <p className={`text-xs font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
-                                {item.trend === null || item.trend === undefined ? '0' : String(item.trend)}
+                              <p className="text-sm font-bold text-gray-800">
+                                {item.percentage === null ||
+                                item.percentage === undefined
+                                  ? "null"
+                                  : `${item.percentage}%`}
+                              </p>
+                              <p
+                                className={`text-xs font-medium ${trendUp ? "text-green-600" : "text-red-600"}`}
+                              >
+                                {item.trend === null || item.trend === undefined
+                                  ? "0"
+                                  : String(item.trend)}
                               </p>
                             </div>
                           </div>
@@ -205,14 +316,32 @@ export default function Analytics() {
                       { name: null, score: null, packages: null },
                     ];
                     return list.map((person, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-8 h-8 bg-[#1B00BF] rounded-full flex items-center justify-center text-white font-bold text-sm">{index + 1}</div>
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div className="w-8 h-8 bg-[#1B00BF] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          {index + 1}
+                        </div>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-800">{person.name === null || person.name === undefined ? 'null' : person.name}</p>
-                          <p className="text-xs text-gray-500">{person.packages === null || person.packages === undefined ? 'null' : `${person.packages} packages`}</p>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {person.name === null || person.name === undefined
+                              ? "null"
+                              : person.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {person.packages === null ||
+                            person.packages === undefined
+                              ? "null"
+                              : `${person.packages} packages`}
+                          </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-[#1B00BF]">{person.score === null || person.score === undefined ? 'null' : person.score}</p>
+                          <p className="text-sm font-bold text-[#1B00BF]">
+                            {person.score === null || person.score === undefined
+                              ? "null"
+                              : person.score}
+                          </p>
                           <p className="text-xs text-gray-500">score</p>
                         </div>
                       </div>
@@ -230,24 +359,42 @@ export default function Analytics() {
                   {(() => {
                     const pd = dashboardData?.packageDistribution;
                     const list = pd || [
-                      { type: 'Express', count: null, color: 'bg-red-500' },
-                      { type: 'Standard', count: null, color: 'bg-blue-500' },
-                      { type: 'Economy', count: null, color: 'bg-green-500' },
-                      { type: 'International', count: null, color: 'bg-purple-500' },
+                      { type: "Express", count: null, color: "bg-red-500" },
+                      { type: "Standard", count: null, color: "bg-blue-500" },
+                      { type: "Economy", count: null, color: "bg-green-500" },
+                      {
+                        type: "International",
+                        count: null,
+                        color: "bg-purple-500",
+                      },
                     ];
                     return list.map((item, index) => (
                       <div key={index} className="flex items-center gap-3">
-                        <div className={`w-3 h-3 ${item.color} rounded-full`}></div>
-                        <div className="flex-1"><p className="text-sm font-medium text-gray-700">{item.type}</p></div>
-                        <p className="text-sm font-bold text-gray-800">{item.count === null || item.count === undefined ? 'null' : item.count}</p>
+                        <div
+                          className={`w-3 h-3 ${item.color} rounded-full`}
+                        ></div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-700">
+                            {item.type}
+                          </p>
+                        </div>
+                        <p className="text-sm font-bold text-gray-800">
+                          {item.count === null || item.count === undefined
+                            ? "null"
+                            : item.count}
+                        </p>
                       </div>
                     ));
                   })()}
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-700">Total</span>
-                    <span className="text-lg font-bold text-gray-800">{dashboardData?.packageDistributionTotal ?? 'null'}</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Total
+                    </span>
+                    <span className="text-lg font-bold text-gray-800">
+                      {dashboardData?.packageDistributionTotal ?? "null"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -282,24 +429,44 @@ export default function Analytics() {
                       ></circle>
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-gray-800">{dashboardData?.satisfaction?.rating ?? 'null'}</span>
+                      <span className="text-3xl font-bold text-gray-800">
+                        {dashboardData?.satisfaction?.rating ?? "null"}
+                      </span>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 mt-4">จาก 5 คะแนน</p>
-                  <p className="text-xs text-gray-500 mt-1">{dashboardData?.satisfaction?.reviews ?? 'null'} reviews</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {dashboardData?.satisfaction?.reviews ?? "null"} reviews
+                  </p>
                 </div>
                 <div className="mt-4 space-y-2">
-                  {(dashboardData?.satisfaction?.breakdown ?? [null, null, null, null, null]).map((pct, idx) => {
+                  {(
+                    dashboardData?.satisfaction?.breakdown ?? [
+                      null,
+                      null,
+                      null,
+                      null,
+                      null,
+                    ]
+                  ).map((pct, idx) => {
                     const star = 5 - idx;
                     const width = pct === null || pct === undefined ? 0 : pct;
-                    const label = pct === null || pct === undefined ? 'null' : `${pct}%`;
+                    const label =
+                      pct === null || pct === undefined ? "null" : `${pct}%`;
                     return (
                       <div key={star} className="flex items-center gap-2">
-                        <span className="text-xs text-gray-600 w-8">{star} ⭐</span>
+                        <span className="text-xs text-gray-600 w-8">
+                          {star} ⭐
+                        </span>
                         <div className="flex-1 bg-gray-200 rounded-full h-2">
-                          <div className="bg-yellow-400 h-2 rounded-full" style={{ width: `${width}%` }}></div>
+                          <div
+                            className="bg-yellow-400 h-2 rounded-full"
+                            style={{ width: `${width}%` }}
+                          ></div>
                         </div>
-                        <span className="text-xs text-gray-600 w-10 text-right">{label}</span>
+                        <span className="text-xs text-gray-600 w-10 text-right">
+                          {label}
+                        </span>
                       </div>
                     );
                   })}
@@ -334,22 +501,61 @@ export default function Analytics() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(dashboardData?.weeklyTrends ?? [null, null, null, null]).map((item, index) => {
-                      const row = item || { week: null, packages: null, users: null, efficiency: null, trend: null };
+                    {(
+                      dashboardData?.weeklyTrends ?? [null, null, null, null]
+                    ).map((item, index) => {
+                      const row = item || {
+                        week: null,
+                        packages: null,
+                        users: null,
+                        efficiency: null,
+                        trend: null,
+                      };
                       // trend default to 0 per request; if trend is 'up'/'down' convert to numeric sign
                       const trendRaw = row.trend;
                       let trendVal = 0;
-                      if (trendRaw === 'up') trendVal = 1;
-                      else if (trendRaw === 'down') trendVal = -1;
-                      else if (typeof trendRaw === 'number') trendVal = trendRaw;
+                      if (trendRaw === "up") trendVal = 1;
+                      else if (trendRaw === "down") trendVal = -1;
+                      else if (typeof trendRaw === "number")
+                        trendVal = trendRaw;
                       else trendVal = parseTrend(trendRaw);
                       return (
-                        <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4 text-sm font-medium text-gray-800">{row.week === null || row.week === undefined ? 'null' : row.week}</td>
-                          <td className="py-3 px-4 text-sm text-gray-600">{row.packages === null || row.packages === undefined ? 'null' : row.packages}</td>
-                          <td className="py-3 px-4 text-sm text-gray-600">{row.users === null || row.users === undefined ? 'null' : row.users}</td>
-                          <td className="py-3 px-4"><span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">{row.efficiency === null || row.efficiency === undefined ? 'null' : `${row.efficiency}%`}</span></td>
-                          <td className="py-3 px-4">{trendVal > 0 ? <TrendingUp className="w-5 h-5 text-green-500" /> : trendVal < 0 ? <TrendingDown className="w-5 h-5 text-red-500" /> : <span className="text-xs text-gray-500">0</span>}</td>
+                        <tr
+                          key={index}
+                          className="border-b border-gray-100 hover:bg-gray-50"
+                        >
+                          <td className="py-3 px-4 text-sm font-medium text-gray-800">
+                            {row.week === null || row.week === undefined
+                              ? "null"
+                              : row.week}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            {row.packages === null || row.packages === undefined
+                              ? "null"
+                              : row.packages}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            {row.users === null || row.users === undefined
+                              ? "null"
+                              : row.users}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                              {row.efficiency === null ||
+                              row.efficiency === undefined
+                                ? "null"
+                                : `${row.efficiency}%`}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {trendVal > 0 ? (
+                              <TrendingUp className="w-5 h-5 text-green-500" />
+                            ) : trendVal < 0 ? (
+                              <TrendingDown className="w-5 h-5 text-red-500" />
+                            ) : (
+                              <span className="text-xs text-gray-500">0</span>
+                            )}
+                          </td>
                         </tr>
                       );
                     })}
