@@ -71,21 +71,13 @@ export default function Stock() {
         }
 
         const mapped = data.map((item) => {
-          const dt = item.updated_at ? new Date(item.updated_at) : null;
-          const thaiDate = dt
-            ? dt.toLocaleString("th-TH", {
-                timeZone: "Asia/Bangkok",
-                hour12: false,
-              })
-            : null;
-
           return {
             product_id: item.product_id || null,
             sku: item.sku || null,
             name: item.name || null,
             price: item.price ? `฿${Number(item.price).toLocaleString("th-TH")}` : null,
             stock_quantity: item.stock_quantity || 0,
-            updated_at: thaiDate,
+            updated_at: item.updated_at || null,
             platform: item.platform || null,
           };
         });
