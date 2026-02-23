@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Package,
   Search,
@@ -13,105 +13,106 @@ import Header from "../main_header";
 
 export default function Stock() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [stockData, setStockData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const categories = [
-    { id: "all", label: "ทั้งหมด" },
-    { id: "electronics", label: "อิเล็กทรอนิกส์" },
-    { id: "clothing", label: "เสื้อผ้า" },
-    { id: "food", label: "อาหาร" },
-    { id: "books", label: "หนังสือ" },
-    { id: "others", label: "อื่นๆ" },
-  ];
+  useEffect(() => {
+    const ac = new AbortController();
+    
+    async function loadStock() {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch(
+          "https://30cc-124-122-9-179.ngrok-free.app/api/products",
+          {
+            signal: ac.signal,
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
 
-  const stockData = [
-    {
-      id: "STK001",
-      name: "iPhone 15 Pro",
-      category: "electronics",
-      quantity: 45,
-      status: "in-stock",
-      location: "A-01",
-      lastUpdate: "12/02/2026",
-    },
-    {
-      id: "STK002",
-      name: "เสื้อยืดผ้าฝ้าย",
-      category: "clothing",
-      quantity: 120,
-      status: "in-stock",
-      location: "B-05",
-      lastUpdate: "12/02/2026",
-    },
-    {
-      id: "STK003",
-      name: "MacBook Air M3",
-      category: "electronics",
-      quantity: 8,
-      status: "low-stock",
-      location: "A-03",
-      lastUpdate: "11/02/2026",
-    },
-    {
-      id: "STK004",
-      name: "ขนมปัง",
-      category: "food",
-      quantity: 0,
-      status: "out-of-stock",
-      location: "C-12",
-      lastUpdate: "10/02/2026",
-    },
-    {
-      id: "STK005",
-      name: "หนังสือ React Guide",
-      category: "books",
-      quantity: 67,
-      status: "in-stock",
-      location: "D-08",
-      lastUpdate: "12/02/2026",
-    },
-    {
-      id: "STK006",
-      name: "AirPods Pro",
-      category: "electronics",
-      quantity: 15,
-      status: "low-stock",
-      location: "A-02",
-      lastUpdate: "11/02/2026",
-    },
-    {
-      id: "STK007",
-      name: "กางเกงยีนส์",
-      category: "clothing",
-      quantity: 89,
-      status: "in-stock",
-      location: "B-07",
-      lastUpdate: "12/02/2026",
-    },
-    {
-      id: "STK008",
-      name: "กาแฟสำเร็จรูป",
-      category: "food",
-      quantity: 234,
-      status: "in-stock",
-      location: "C-03",
-      lastUpdate: "12/02/2026",
-    },
-  ];
+        if (!res.ok) throw new Error("Failed to fetch stock data");
 
-  const filteredStock =
-    selectedCategory === "all"
-      ? stockData
-      : stockData.filter((item) => item.category === selectedCategory);
+        const contentType = res.headers.get("content-type") || "";
+        let data;
+        if (contentType.includes("application/json")) {
+          try {
+            data = await res.json();
+          } catch (e) {
+            const text = await res.text();
+            throw new Error(
+              "Invalid JSON response: " + (text ? text.slice(0, 200) : "(empty)")
+            );
+          }
+        } else {
+          const text = await res.text();
+          console.error(
+            "❌ API returned HTML, not JSON. Response preview:",
+            text.slice(0, 300)
+          );
+          throw new Error(
+            `API returned ${
+              contentType || "text/html"
+            } instead of JSON. Check browser console for details.`
+          );
+        }
 
-  const getStatusBadge = (status) => {
-    if (status === "in-stock") {
+        if (!Array.isArray(data)) {
+          if (data && Array.isArray(data.data)) {
+            data = data.data;
+          } else {
+            setStockData([]);
+            return;
+          }
+        }
+
+        const mapped = data.map((item) => {
+          const dt = item.updated_at ? new Date(item.updated_at) : null;
+          const thaiDate = dt
+            ? dt.toLocaleString("th-TH", {
+                timeZone: "Asia/Bangkok",
+                hour12: false,
+              })
+            : null;
+
+          return {
+            product_id: item.product_id || null,
+            sku: item.sku || null,
+            name: item.name || null,
+            price: item.price ? `฿${Number(item.price).toLocaleString("th-TH")}` : null,
+            stock_quantity: item.stock_quantity || 0,
+            updated_at: thaiDate,
+            platform: item.platform || null,
+          };
+        });
+
+        setStockData(mapped);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message);
+          console.error("❌ Error loading stock:", err);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadStock();
+    return () => ac.abort();
+  }, []);
+
+  const getStatusBadge = (quantity) => {
+    if (quantity === 0) {
       return (
-        <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-          มีสินค้า
+        <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+          หมด
         </span>
       );
-    } else if (status === "low-stock") {
+    } else if (quantity < 10) {
       return (
         <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
           ใกล้หมด
@@ -119,19 +120,27 @@ export default function Stock() {
       );
     } else {
       return (
-        <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-          หมดสต็อก
+        <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+          มีสินค้า
         </span>
       );
     }
   };
 
+  const filteredStock = stockData.filter(
+    (item) =>
+      (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.product_id && item.product_id.includes(searchTerm)) ||
+      (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   const stockSummary = {
     total: stockData.length,
-    inStock: stockData.filter((item) => item.status === "in-stock").length,
-    lowStock: stockData.filter((item) => item.status === "low-stock").length,
-    outOfStock: stockData.filter((item) => item.status === "out-of-stock")
-      .length,
+    inStock: stockData.filter((item) => item.stock_quantity >= 10).length,
+    lowStock: stockData.filter(
+      (item) => item.stock_quantity > 0 && item.stock_quantity < 10
+    ).length,
+    outOfStock: stockData.filter((item) => item.stock_quantity === 0).length,
   };
 
   return (
@@ -232,7 +241,9 @@ export default function Stock() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                       type="text"
-                      placeholder="ค้นหาสินค้า..."
+                      placeholder="ค้นหาสินค้า (ชื่อ, รหัส, SKU)..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg
                                focus:outline-none focus:ring-2 focus:ring-[#1B00BF] focus:border-transparent"
                     />
@@ -248,93 +259,87 @@ export default function Stock() {
                   <span>เพิ่มสินค้า</span>
                 </button>
               </div>
-
-              {/* Categories */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedCategory === category.id
-                        ? "bg-[#1B00BF] text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {category.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Stock Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        รหัสสินค้า
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        ชื่อสินค้า
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        จำนวน
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        ตำแหน่ง
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        สถานะ
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        อัปเดตล่าสุด
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        การดำเนินการ
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredStock.map((item, index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-gray-100 hover:bg-gray-50"
-                      >
-                        <td className="py-3 px-4 text-sm font-medium text-gray-800">
-                          {item.id}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          {item.name}
-                        </td>
-                        <td className="py-3 px-4 text-sm font-semibold text-gray-800">
-                          {item.quantity}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          {item.location}
-                        </td>
-                        <td className="py-3 px-4">
-                          {getStatusBadge(item.status)}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-600">
-                          {item.lastUpdate}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors">
-                              <Edit className="w-4 h-4 text-blue-600" />
-                            </button>
-                            <button className="p-2 hover:bg-red-50 rounded-lg transition-colors">
-                              <Trash2 className="w-4 h-4 text-red-600" />
-                            </button>
-                          </div>
-                        </td>
+              {loading ? (
+                <p className="text-gray-600 text-center py-8">กำลังโหลดข้อมูล...</p>
+              ) : error ? (
+                <p className="text-red-600 text-center py-8">❌ {error}</p>
+              ) : filteredStock.length === 0 ? (
+                <p className="text-gray-600 text-center py-8">ไม่มีข้อมูล</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          รหัสสินค้า
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          ชื่อสินค้า
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          ราคา
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          จำนวน
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          สถานะ
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          อัปเดตล่าสุด
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          การดำเนินการ
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {filteredStock.map((item, index) => (
+                        <tr
+                          key={index}
+                          className="border-b border-gray-100 hover:bg-gray-50"
+                        >
+                          <td className="py-3 px-4 text-sm font-medium text-gray-800">
+                            <div>{item.product_id}</div>
+                            {item.sku && (
+                              <div className="text-xs text-gray-500">{item.sku}</div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            {item.name}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-semibold text-gray-800">
+                            {item.price}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-semibold text-gray-800">
+                            {item.stock_quantity}
+                          </td>
+                          <td className="py-3 px-4">
+                            {getStatusBadge(item.stock_quantity)}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            {item.updated_at}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                <Edit className="w-4 h-4 text-blue-600" />
+                              </button>
+                              <button className="p-2 hover:bg-red-50 rounded-lg transition-colors">
+                                <Trash2 className="w-4 h-4 text-red-600" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </main>
