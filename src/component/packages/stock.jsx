@@ -281,6 +281,9 @@ export default function Stock() {
                           ชื่อสินค้า
                         </th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          แพลตฟอร์ม
+                        </th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
                           ราคา
                         </th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
@@ -311,6 +314,11 @@ export default function Stock() {
                           </td>
                           <td className="py-3 px-4 text-sm text-gray-600">
                             {item.name}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-600">
+                            <span className="inline-block px-2 py-1 rounded bg-gray-100 text-gray-700 capitalize text-xs font-medium">
+                              {item.platform}
+                            </span>
                           </td>
                           <td className="py-3 px-4 text-sm font-semibold text-gray-800">
                             {item.price}
