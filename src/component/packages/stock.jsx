@@ -26,7 +26,7 @@ export default function Stock() {
         setLoading(true);
         setError(null);
         const res = await fetch(
-          "https://30cc-124-122-9-179.ngrok-free.app/api/products",
+          "https://ad70-203-131-216-119.ngrok-free.app/api/products",
           {
             signal: ac.signal,
             headers: {
