@@ -7,12 +7,13 @@ import Register from "./component/Register";
 import Order from "./component/packages/order";
 import Stock from "./component/packages/stock";
 import UserProfile from "./component/UserProfile";
-
+import Login from "./component/Login";
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainPage />} />
+        <Route path="/home" element={<MainPage />} />
+        <Route path="/" element={<Login />} />
         <Route path="/dashboard/stats" element={<Statistics />} />
         <Route path="/dashboard/analytics" element={<Analytics />} />
         <Route path="/packages/stock" element={<Stock />} />

@@ -269,6 +269,10 @@ export default function Stock() {
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
                           รหัสสินค้า
                         </th>
+                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
+                          SKU
+                        </th>
+                        
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
                           ชื่อสินค้า
                         </th>

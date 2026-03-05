@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../image/boxmateLogo1.jpg";
 
-export default function Register() {
+export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
   const [error, setError] = useState("");
 
@@ -24,37 +22,30 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    // ตรวจสอบว่า password ตรงกัน
-    if (formData.password !== formData.confirmPassword) {
-      setError("รหัสผ่านไม่ตรงกัน");
-      return;
-    }
-
     // ตรวจสอบว่าเติมข้อมูลครบ
-    if (!formData.fullName || !formData.email || !formData.password) {
+    if (!formData.email || !formData.password) {
       setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
 
     try {
       // TODO: ส่งข้อมูลไปยัง API ที่นี่
-      const registrationData = {
-        fullName: formData.fullName,
+      const loginData = {
         email: formData.email,
         password: formData.password,
       };
       
-      console.log("ข้อมูลการลงทะเบียน:", registrationData);
+      console.log("ข้อมูลการเข้าสู่ระบบ:", loginData);
 
       // จำลองการปิด loading และ navigate
-      // const response = await fetch('/api/register', {
+      // const response = await fetch('/api/login', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(registrationData)
+      //   body: JSON.stringify(loginData)
       // });
 
-      // สำเร็จแล้ว ไปหน้า login
-      navigate("/");
+      // สำเร็จแล้ว ไปหน้า home
+      navigate("/home");
     } catch (err) {
       setError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
     }
@@ -70,10 +61,10 @@ export default function Register() {
         {/* Form สำหรับ Mobile */}
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 w-full max-w-sm border border-white/20 shadow-2xl">
           <h2 className="text-white text-2xl font-bold mb-2 text-center">
-            Sign Up
+            Sign In
           </h2>
           <p className="text-white/70 text-xs mb-5 text-center">
-            สร้างบัญชีของคุณ
+            เข้าสู่ระบบของคุณ
           </p>
 
           {error && (
@@ -83,23 +74,6 @@ export default function Register() {
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Full Name */}
-            <div>
-              <label className="text-white text-xs font-medium block mb-1.5">
-                ชื่อ-นามสกุล
-              </label>
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 rounded-lg bg-white/10 border border-white/30
-                         text-white text-sm placeholder-white/50 focus:outline-none focus:ring-2
-                         focus:ring-[#1B00BF] focus:border-transparent transition"
-                placeholder="กรอกชื่อ-นามสกุล"
-              />
-            </div>
-
             {/* Email */}
             <div>
               <label className="text-white text-xs font-medium block mb-1.5">
@@ -130,24 +104,7 @@ export default function Register() {
                 className="w-full px-3 py-2.5 rounded-lg bg-white/10 border border-white/30
                          text-white text-sm placeholder-white/50 focus:outline-none focus:ring-2
                          focus:ring-[#1B00BF] focus:border-transparent transition"
-                placeholder="อย่างน้อย 6 ตัวอักษร"
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="text-white text-xs font-medium block mb-1.5">
-                ยืนยันรหัสผ่าน
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 rounded-lg bg-white/10 border border-white/30
-                         text-white text-sm placeholder-white/50 focus:outline-none focus:ring-2
-                         focus:ring-[#1B00BF] focus:border-transparent transition"
-                placeholder="กรอกรหัสผ่านอีกครั้ง"
+                placeholder="กรอกรหัสผ่าน"
               />
             </div>
 
@@ -158,14 +115,14 @@ export default function Register() {
                        py-2.5 px-4 rounded-lg transition duration-200 transform
                        hover:scale-[1.02] active:scale-[0.98] shadow-lg text-sm"
             >
-              ลงทะเบียน
+              เข้าสู่ระบบ
             </button>
 
-            {/* Login Link */}
+            {/* Register Link */}
             <p className="text-white/70 text-sm text-center mt-4">
-              มีบัญชีอยู่แล้ว?{" "}
-              <a href="/login" className="text-[#1B00BF] hover:text-[#1500a0] font-semibold">
-                เข้าสู่ระบบ
+              ยังไม่มีบัญชี?{" "}
+              <a href="/register" className="text-[#1B00BF] hover:text-[#1500a0] font-semibold">
+                สร้างบัญชี
               </a>
             </p>
           </form>
@@ -179,14 +136,14 @@ export default function Register() {
           <img className="w-64 h-auto" src={Logo} alt="Boxmate Logo" />
         </div>
 
-        {/* REGISTER FORM (Desktop)*/}
+        {/* LOGIN FORM (Desktop)*/}
         <div className="absolute inset-0 z-10 flex items-center justify-end pr-32">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 w-full max-w-md border border-white/20 shadow-2xl">
             <h2 className="text-white text-3xl font-bold mb-2 text-center">
-              Sign Up
+              Sign In
             </h2>
             <p className="text-white/70 text-sm mb-6 text-center">
-              สร้างบัญชีของคุณ
+              เข้าสู่ระบบของคุณ
             </p>
 
             {error && (
@@ -196,23 +153,6 @@ export default function Register() {
             )}
 
             <form className="space-y-5" onSubmit={handleSubmit}>
-              {/* Full Name */}
-              <div>
-                <label className="text-white text-sm font-medium block mb-2">
-                  ชื่อ-นามสกุล
-                </label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30
-                           text-white placeholder-white/50 focus:outline-none focus:ring-2
-                           focus:ring-[#1B00BF] focus:border-transparent transition"
-                  placeholder="กรอกชื่อ-นามสกุล"
-                />
-              </div>
-
               {/* Email */}
               <div>
                 <label className="text-white text-sm font-medium block mb-2">
@@ -243,24 +183,7 @@ export default function Register() {
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30
                            text-white placeholder-white/50 focus:outline-none focus:ring-2
                            focus:ring-[#1B00BF] focus:border-transparent transition"
-                  placeholder="อย่างน้อย 6 ตัวอักษร"
-                />
-              </div>
-
-              {/* Confirm Password */}
-              <div>
-                <label className="text-white text-sm font-medium block mb-2">
-                  ยืนยันรหัสผ่าน
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30
-                           text-white placeholder-white/50 focus:outline-none focus:ring-2
-                           focus:ring-[#1B00BF] focus:border-transparent transition"
-                  placeholder="กรอกรหัสผ่านอีกครั้ง"
+                  placeholder="กรอกรหัสผ่าน"
                 />
               </div>
 
@@ -271,14 +194,14 @@ export default function Register() {
                          py-3 px-4 rounded-lg transition duration-200 transform
                          hover:scale-[1.02] active:scale-[0.98] shadow-lg"
               >
-                ลงทะเบียน
+                เข้าสู่ระบบ
               </button>
 
-              {/* Login Link */}
+              {/* Register Link */}
               <p className="text-white/70 text-sm text-center mt-4">
-                มีบัญชีอยู่แล้ว?{" "}
-                <a href="/login" className="text-[#1B00BF] hover:text-[#1500a0] font-semibold">
-                  เข้าสู่ระบบ
+                ยังไม่มีบัญชี?{" "}
+                <a href="/register" className="text-[#1B00BF] hover:text-[#1500a0] font-semibold">
+                  สร้างบัญชี
                 </a>
               </p>
             </form>
