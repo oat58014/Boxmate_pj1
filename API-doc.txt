@@ -40,6 +40,16 @@
                         "orders": 15
                     }...(monthly or weekly)
                 },
+                "total_product_detail" : {
+                    "product" : {
+                        "product_name" : "string",
+                        "total_order" : "12345",
+                    },
+                    {
+                        "product_name" : "string",
+                        "total_order" : "12345",
+                    },
+                }
                 "Order" :{//Or return object of order
                     "Order_id" : "12345",
                     "Customer_Name" : "String",
@@ -67,9 +77,35 @@
                     "revenue_growth" : "12.12%"
                     "total_order_growth" : "12.12%"
                     "tiktok_total_order_growth" : "12.12%"
+                    "lazada_total_order_growth" : "12.12%"
                 }
             }
     Stat Page
+    Name : Monthly stat
+            Description : stat ทุกอย่าง
+            Endpoint : (URL)
+            Type : Get
+            API_Number : 3
+            Key_parameter:
+            {
+                "id" : "12245"
+                "date" : "12-45-56"
+            }
+            Parameter Key:
+            {
+                "*customer_id" : "12345",
+                "*token_key" : "12345",
+                "date" : "2026-5-6",
+            }
+            result
+            {
+                "data" : {
+                    "revenue_growth" : "12.12%"
+                    "total_order_growth" : "12.12%"
+                    "tiktok_total_order_growth" : "12.12%"
+                    "lazada_total_order_growth" : "12.12%"
+                }
+            }
     Analysis Page
     Order Page
     Product Page
