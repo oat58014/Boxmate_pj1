@@ -1,0 +1,77 @@
+    symbol
+    * == จำเป็นต้องมี
+    
+    Dashboard Page
+        Name : dashboard data
+            Description : ข้อมู,ที่เก็บในดาต้าเบสเฉยๆ แบบยอดขายอะไรอยย่างี้
+            Endpoint : (URL)
+            Type : Get
+            API_Number : 1
+            Parameter Key:
+            {
+                "*customer_id" : "12345",
+                "*token_key" : "12345",
+                "date" : "2026-5-6",
+            }
+            Result :
+            {
+                "data" :{
+                    "Revenue" : "12345.12"
+                    "Total_orders" : "12345",
+                    "Tiktok_orders" : "12345",
+                    "Lazada_orders" : "12345"
+                    "Pending_orders" : "12345"
+                    
+                },
+                "data_stat" : {
+                    {
+                        "date": "2026-03-07",
+                        "totalSales": 4500,
+                        "orders": 12
+                    },
+                    {
+                        "date": "2026-03-06",
+                        "totalSales": 3200,
+                        "orders": 8
+                    },
+                    {
+                        "date": "2026-03-05",
+                        "totalSales": 5100,
+                        "orders": 15
+                    }...(monthly or weekly)
+                },
+                "Order" :{//Or return object of order
+                    "Order_id" : "12345",
+                    "Customer_Name" : "String",
+                    "Total" : "double"
+                    "Platform" : "String"
+                    "Status" : "String"
+                },
+            }
+        
+        Name : Dashbaord analysis data
+            Description : ข้อมูลที่ใช้machine learining คำนวนมา ๖หรือถ้าเก็บในดาต้าเบสเอามาเลยก็ได้"
+            Endpoint : (URL)
+            Type : Get
+            API_Number : 2
+            Key_parameter:
+            Parameter Key:
+            {
+                "*customer_id" : "12345",
+                "*token_key" : "12345",
+                "date" : "2026-5-6",
+            }
+            data :
+            {
+                "data" : {
+                    "revenue_growth" : "12.12%"
+                    "total_order_growth" : "12.12%"
+                    "tiktok_total_order_growth" : "12.12%"
+                }
+            }
+    Stat Page
+    Analysis Page
+    Order Page
+    Product Page
+    Login Page
+    Register Page
