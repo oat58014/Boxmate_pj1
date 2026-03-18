@@ -8,76 +8,78 @@
             Type : Get
             API_Number : 1
             Parameter Key:
-            {
-                "*customer_id" : "12345",
-                "*token_key" : "12345",
-                "date" : "2026-5-6",
-            }
+                {
+                    "*customer_id" : "12345",
+                    "*token_key" : "12345",
+                    "date" : "2026-5-6",
+                }
             Result :
-            {
-                "data" :{
-                    "Revenue" : "12345.12"
-                    "Total_orders" : "12345",
-                    "Tiktok_orders" : "12345",
-                    "Lazada_orders" : "12345"
-                    "Pending_orders" : "12345"
-                    
-                },
-                "data_stat" : {
-                    {
-                        "date": "2026-03-07",
-                        "totalSales": 4500,
-                        "orders": 12
+                {
+                    "data" :{
+                        "Revenue" : "12345.12"
+                        "Total_orders" : "12345",
+                        "Tiktok_orders" : "12345",
+                        "Lazada_orders" : "12345"
+                        "Pending_orders" : "12345"
+                        
                     },
-                    {
-                        "date": "2026-03-06",
-                        "totalSales": 3200,
-                        "orders": 8
+                    "data_stat" : {
+                        {
+                            "date": "2026-03-07",
+                            "totalSales": 4500,
+                            "orders": 12
+                        },
+                        {
+                            "date": "2026-03-06",
+                            "totalSales": "3200",
+                            "orders": "8"
+                        },
+                        {
+                            "date": "2026-03-05",
+                            "totalSales": "5100",
+                            "orders": "15"
+                        }...(monthly or weekly)
                     },
-                    {
-                        "date": "2026-03-05",
-                        "totalSales": 5100,
-                        "orders": 15
-                    }...(monthly or weekly)
-                },
-                "total_product_detail" : {
-                    "product" : {
-                        "product_name" : "string",
-                        "total_order" : "12345",
-                    },
-                    {
-                        "product_name" : "string",
-                        "total_order" : "12345",
+                    "total_product_detail" : {
+                        "product" : {
+                            "product_name" : "string",
+                            "total_order" : "12345",
+                        },
+                        {
+                            "product_name" : "string",
+                            "total_order" : "12345",
+                        },
+                    }
+                    "Order" :{//Or return object of order
+                        "Order_id" : "12345",
+                        "Customer_Name" : "String",
+                        "Total" : "double"
+                        "Platform" : "String"
+                        "Status" : "String"
                     },
                 }
-                "Order" :{//Or return object of order
-                    "Order_id" : "12345",
-                    "Customer_Name" : "String",
-                    "Total" : "double"
-                    "Platform" : "String"
-                    "Status" : "String"
-                },
-            }
         
         Name : Dashbaord analysis data
             Description : ข้อมูลที่ใช้machine learining คำนวนมา ๖หรือถ้าเก็บในดาต้าเบสเอามาเลยก็ได้"
             Endpoint : (URL)
             Type : Get
             API_Number : 2
-            Key_parameter:
             Parameter Key:
             {
                 "*customer_id" : "12345",
                 "*token_key" : "12345",
                 "date" : "2026-5-6",
             }
-            data :
+            result :
             {
                 "data" : {
-                    "revenue_growth" : "12.12%"
-                    "total_order_growth" : "12.12%"
-                    "tiktok_total_order_growth" : "12.12%"
-                    "lazada_total_order_growth" : "12.12%"
+                    "revenue_growth" : "12.12%",
+                    "total_order_growth" : "12.12%",
+                    "tiktok_total_order_growth" : "12.12%",
+                    "lazada_total_order_growth" : "12.12%",
+                    "monthly_income_growth" : "12.12%",
+                    "monthly_order" : "12.12#",
+                    "monthly_goal" : "123"
                 }
             }
     Stat Page
@@ -87,27 +89,182 @@
             Type : Get
             API_Number : 3
             Key_parameter:
+                {
+                    "id" : "12245"
+                    "date" : "12-45-56"
+                }
+                Parameter Key:
+                {
+                    "*customer_id" : "12345",
+                    "*token_key" : "12345",
+                    "date" : "2026-5-6",
+                    "month" : "string"
+                }
+            result
             {
-                "id" : "12245"
-                "date" : "12-45-56"
+                "data_stat" : {
+                    "data_stat" : {
+                        {
+                            "date": "2026-03-07",
+                            "total_Sales": 4500,
+                            "orders": 12
+                        },
+                        {
+                            "date": "2026-03-06",
+                            "total_Sales": "3200",
+                            "orders": "8"
+                        },
+                        {
+                            "date": "2026-03-05",
+                            "total_Sales": "5100",
+                            "orders": "15"
+                        }...(monthly or weekly)
+                    },
+                "data" : {
+                        "revenue_growth" : "12.12%",
+                        "total_order_growth" : "12.12%",
+                        "tiktok_total_order_growth" : "12.12%",
+                        "lazada_total_order_growth" : "12.12%",
+                        "monthly_income_growth" : "12.12%",
+                        "monthly_order" : "12.12#",
+                        "monthly_goal" : "123",
+                    },
+                },
             }
+    Analysis Page
+    Name : Monthly stat
+            Description : analysing stats
+            Endpoint : (URL)
+            Type : Get
+            API_Number : 4
+            Key_parameter:
+                {
+                    "id" : "12245"
+                    "date" : "12-45-56"
+                }
+                Parameter Key:
+                {
+                    "*customer_id" : "12345",
+                    "*token_key" : "12345",
+                    "date" : "2026-5-6",
+                    "month" : "string"
+                }
+            result
+            {
+                "balance" : "1234",
+                "monthly_income" : "1234",
+                "order_stock" : "1234"
+                "daily_stat" : {
+                    "total_order_analyze_stat" : {
+                        {
+                            "date": "2026-03-07",
+                            "total_Sales" : 4500,
+                            "orders": 12
+                        },
+                        {
+                            "date": "2026-03-06",
+                            "total_Sales" : "3200",
+                            "orders": "8"
+                        },
+                        {
+                            "date": "2026-03-05",
+                            "total_Sales" : "5100",
+                            "orders": "15"
+                        }...(monthly or weekly)
+                    },
+                    "data_analyze" : {
+                        "revenue_growth" : "12.12%",
+                        "total_order_growth" : "12.12%",
+                        "tiktok_total_order_growth" : "12.12%",
+                        "lazada_total_order_growth" : "12.12%",
+                        "monthly_income_growth" : "12.12%",
+                        "monthly_order" : "12.12#",
+                        "monthly_goal" : "123",
+                    },
+                    "stock_analyze" : {
+                        {
+                            "product_name" : "1234",
+                            "product_demand" : " 1234",
+                            "stock_remaining" : "1234",
+                            "category" : "string",
+                        },
+                        {
+                            "product_name" : "1234",
+                            "product_demand" : " 1234",
+                            "stock_remaining" : "1234",
+                            "category" : "string",
+                        },
+                        {
+                            "product_name" : "1234",
+                            "product_demand" : " 1234",
+                            "stock_remaining" : "1234",
+                            "category" : "string",
+                        },
+                    }
+                },
+            }
+    Stock Page
+        Name : Stock
+            Description : stock data
+            Endpoint : (URL)
+            Type : Get
+            API_Number : 5
             Parameter Key:
+                {
+                    "*customer_id" : "12345",
+                    "*token_key" : "12345",
+                    "date" : "2026-5-6",
+                    "month" : "string"
+                }
+            result
             {
-                "*customer_id" : "12345",
-                "*token_key" : "12345",
-                "date" : "2026-5-6",
+                "Product_name" : "string",
+                "Product_stock" : "1234",
+                "stock_reserved" : "1234",
+                "stock_remaining" : "1234",
+                "category" : "string",
             }
+        Name : Stock edit
+            Description : Edit product description
+            Endpoint : (URL)
+            Type : Put
+            API_Number : 6
+            Key_parameter:
+                {
+                    "id" : "12245",
+                    "date" : "12-45-56",
+                    "product_name" : "string",
+                    "product_id" : "string",
+                    "product_descript" : "descript",
+                }
+            result
+            {
+                "string" : "success",
+            }
+    Order Page
+        Name : order
+            Description : order stat
+            Endpoint : (URL)
+            Type : get
+            API_Number : 7
+            Key_parameter:
+                {
+                    "id" : "12245",
+                    "date" : "12-45-56",
+                }
             result
             {
                 "data" : {
-                    "revenue_growth" : "12.12%"
-                    "total_order_growth" : "12.12%"
-                    "tiktok_total_order_growth" : "12.12%"
-                    "lazada_total_order_growth" : "12.12%"
+                    "order_id" : "1234",
+                    "sku_id" : "1234",
+                    "platform" : "toktik",
+                    "Customer_Name" : "string",
+                    "address" : "string",
+                    "transaction_status" : "string",
+                    "category" : "string",
+                    "weight" : "double",
                 }
             }
-    Analysis Page
-    Order Page
-    Product Page
+        
     Login Page
     Register Page

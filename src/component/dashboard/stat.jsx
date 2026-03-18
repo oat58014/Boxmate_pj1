@@ -40,7 +40,7 @@ export default function Analytics() {
       setError(null);
       try {
         // adjust endpoint to your backend API
-        const res = await fetch("https://30cc-124-122-9-179.ngrok-free.app/api/orders", {
+        const res = await fetch("https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/orders", {
           signal: ac.signal,
         });
         if (!res.ok) throw new Error("Failed to load dashboard");

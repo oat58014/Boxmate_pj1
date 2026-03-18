@@ -49,7 +49,7 @@ export default function Order() {
         setError(null);
         // TODO: Add auth header if API requires it (uncomment and add token):
         // headers: { Authorization: 'Bearer YOUR_TOKEN' }
-        const res = await fetch("https://ad70-203-131-216-119.ngrok-free.app/api/orders", { 
+        const res = await fetch("https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/orders", { 
           signal: ac.signal,
           headers: {
             "ngrok-skip-browser-warning": "true",

@@ -7,8 +7,8 @@ export default function UserProfile() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const externalLinks = [
-    { id: "tiktok", label: "TikTok", href: "https://383b-27-145-54-30.ngrok-free.app/api/auth/tiktok", icon: Video },
-    { id: "lazada", label: "Lazada", href: "https://383b-27-145-54-30.ngrok-free.app/api/auth/lazada", icon: ShoppingCart },
+    { id: "tiktok", label: "TikTok", href: "https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/auth/tiktok", icon: Video },
+    { id: "lazada", label: "Lazada", href: "https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/auth/lazada", icon: ShoppingCart },
     // { id: "shopee", label: "Shopee", href: "https://shopee.co.th/", icon: ShoppingCart },
   ];
 

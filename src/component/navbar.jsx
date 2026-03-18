@@ -22,7 +22,7 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
   const location = useLocation();
 
   const menuItems = [
-    { icon: Home, label: "หน้าหลัก", path: "/" },
+    { icon: Home, label: "หน้าหลัก", path: "/home" },
     {
       icon: LayoutDashboard,
       label: "Dashboard",
