@@ -9,8 +9,19 @@ import {
   Target,
   Zap,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import Navbar from "../navbar";
 import Header from "../main_header";
+import { showToast } from "../../utils/toastNotification";
 
 export default function Analytics() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -40,12 +51,16 @@ export default function Analytics() {
       setError(null);
       try {
         // adjust endpoint to your backend API
-        const res = await fetch("https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/orders", {
+        const res = await fetch("https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/dashboard/data", {
           signal: ac.signal,
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
         });
         if (!res.ok) throw new Error("Failed to load dashboard");
         const json = await res.json();
-        // expected json shape: { metrics, userBehavior, trafficSources, topPerformers, packageDistribution, satisfaction, weeklyTrends }
+        console.log("Stat Dashboard API Response:", json);
+        // expected json shape: { metrics, userBehavior, trafficSources, topPerformers, packageDistribution, satisfaction, weeklyTrends, data_stat, Order }
         setDashboardData(json || null);
       } catch (err) {
         if (err.name !== "AbortError") setError(err.message || String(err));

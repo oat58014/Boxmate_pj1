@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import MainPage from "./component/Home";
 import Statistics from "./component/dashboard/analytic";
 import Analytics from "./component/dashboard/stat";
@@ -13,7 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/dashboard/stats" element={<Statistics />} />
         <Route path="/dashboard/analytics" element={<Analytics />} />
         <Route path="/packages/stock" element={<Stock />} />

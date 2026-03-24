@@ -19,11 +19,11 @@ export default function Order() {
 
   const statusFilters = [
     { id: "all", label: "ทั้งหมด" },
+    { id: "cancelled", label: "ยกเลิก" },
     { id: "pending", label: "รอดำเนินการ" },
     { id: "processing", label: "กำลังดำเนินการ" },
     { id: "shipping", label: "กำลังจัดส่ง" },
     { id: "completed", label: "สำเร็จ" },
-    { id: "cancelled", label: "ยกเลิก" },
   ];
 
   // stock/order data — will be populated from API; keep an empty array initially
@@ -105,14 +105,17 @@ export default function Order() {
             "cancelled": "cancelled",
           };
           
+          // ดึง status จาก transaction_status หรือ status
+          const rawStatus = o.transaction_status || o.status || "pending";
+          
           return {
             id: o.order_id || null,
-            customer: o.customer_name || null,
+            customer: o.Customer_Name || o.customer_name || null,
             items,
             total: o.amount !== undefined && o.amount !== null ? `฿${Number(o.amount).toLocaleString("th-TH")}` : null,
-            status: statusMap[o.status] || o.status || "pending",
+            status: statusMap[rawStatus] || rawStatus,
             date: thaiDate,
-            address,
+            address: o.address || sampleAddresses[Math.floor(Math.random() * sampleAddresses.length)],
             platform: o.platform || null,
           };
         });
@@ -134,10 +137,21 @@ export default function Order() {
     return () => ac.abort();
   }, []);
 
+  // ลำดับการเรียงในตาราง
+  const statusOrder = {
+    cancelled: 1,
+    pending: 2,
+    processing: 3,
+    shipping: 4,
+    completed: 5,
+  };
+
   const filteredOrders =
     selectedStatus === "all"
-      ? orderData
-      : orderData.filter((order) => order.status === selectedStatus);
+      ? orderData.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99))
+      : orderData
+          .filter((order) => order.status === selectedStatus)
+          .sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
 
   const getStatusBadge = (status) => {
     const statusConfig = {

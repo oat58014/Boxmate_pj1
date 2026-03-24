@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Package,
   Users,
@@ -7,12 +7,56 @@ import {
   ArrowUpRight,
   Activity,
   Clock,
+  AlertCircle,
 } from "lucide-react";
 import Navbar from "../navbar";
 import Header from "../main_header";
+import { showToast } from "../../utils/toastNotification";
 
 export default function Stat() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [analyticData, setAnalyticData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    async function loadAnalyticData() {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch(
+          "https://suitably-nonbeneficed-marisol.ngrok-free.dev/api/dashboard/data",
+          {
+            signal: ac.signal,
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
+
+        console.log("Dashboard Data API Status:", res.status);
+
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("Dashboard Data API Response:", data);
+        setAnalyticData(data?.data || data);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Failed to fetch analytic data:", err);
+          setError(err.message);
+          showToast.error("ไม่สามารถโหลดข้อมูล Dashboard");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAnalyticData();
+    return () => ac.abort();
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -40,7 +84,7 @@ export default function Stat() {
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              {/* Card 1 */}
+              {/* Card 1: Total Orders */}
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-4">
                   <div className="bg-white/20 p-3 rounded-lg">
@@ -49,53 +93,62 @@ export default function Stat() {
                   <TrendingUp className="w-5 h-5 text-white/80" />
                 </div>
                 <p className="text-white/80 text-sm font-medium">
-                  พัสดุทั้งหมด
+                  คำสั่งซื้อทั้งหมด
                 </p>
-                <p className="text-3xl font-bold mt-1">124</p>
-                <p className="text-xs text-white/70 mt-2">
-                  +12% จากเดือนที่แล้ว
+                <p className="text-3xl font-bold mt-1">
+                  {loading ? "-" : analyticData?.Total_orders || 0}
                 </p>
+                <p className="text-xs text-white/70 mt-2">ทั้งหมดแพลตฟอร์ม</p>
               </div>
 
-              {/* Card 2 */}
+              {/* Card 2: Lazada Orders */}
               <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="bg-white/20 p-3 rounded-lg">
-                    <Clock className="w-6 h-6" />
-                  </div>
-                  <Activity className="w-5 h-5 text-white/80" />
-                </div>
-                <p className="text-white/80 text-sm font-medium">รอดำเนินการ</p>
-                <p className="text-3xl font-bold mt-1">12</p>
-                <p className="text-xs text-white/70 mt-2">ต้องรับภายใน 3 วัน</p>
-              </div>
-
-              {/* Card 3 */}
-              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-4">
                   <div className="bg-white/20 p-3 rounded-lg">
                     <Package className="w-6 h-6" />
                   </div>
                   <TrendingUp className="w-5 h-5 text-white/80" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">รับแล้ว</p>
-                <p className="text-3xl font-bold mt-1">98</p>
-                <p className="text-xs text-white/70 mt-2">79% ของทั้งหมด</p>
+                <p className="text-white/80 text-sm font-medium">Lazada Orders</p>
+                <p className="text-3xl font-bold mt-1">
+                  {loading ? "-" : analyticData?.Lazada_orders || 0}
+                </p>
+                <p className="text-xs text-white/70 mt-2">
+                  {analyticData?.Total_orders > 0
+                    ? Math.round((analyticData?.Lazada_orders / analyticData?.Total_orders) * 100)
+                    : 0}
+                  % ของทั้งหมด
+                </p>
               </div>
 
-              {/* Card 4 */}
-              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+              {/* Card 3: Pending Orders */}
+              <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
                 <div className="flex items-center justify-between mb-4">
                   <div className="bg-white/20 p-3 rounded-lg">
-                    <Users className="w-6 h-6" />
+                    <Clock className="w-6 h-6" />
                   </div>
-                  <TrendingDown className="w-5 h-5 text-white/80" />
+                  <AlertCircle className="w-5 h-5 text-white/80" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">ผู้ใช้งาน</p>
-                <p className="text-3xl font-bold mt-1">45</p>
-                <p className="text-xs text-white/70 mt-2">
-                  -3% จากเดือนที่แล้ว
+                <p className="text-white/80 text-sm font-medium">รอดำเนินการ</p>
+                <p className="text-3xl font-bold mt-1">
+                  {loading ? "-" : analyticData?.Pending_orders || 0}
                 </p>
+                <p className="text-xs text-white/70 mt-2">คำสั่งที่รอการยืนยัน</p>
+              </div>
+
+              {/* Card 4: Revenue */}
+              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="bg-white/20 p-3 rounded-lg">
+                    <TrendingUp className="w-6 h-6" />
+                  </div>
+                  <TrendingUp className="w-5 h-5 text-white/80" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">ยอดรายได้</p>
+                <p className="text-2xl font-bold mt-1">
+                  ฿{loading ? "-" : (analyticData?.Revenue || 0).toLocaleString("th-TH", { maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-xs text-white/70 mt-2">รวมจากทั้งหมด</p>
               </div>
             </div>
 
