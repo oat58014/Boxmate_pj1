@@ -21,6 +21,10 @@ function ProductModal({ mode, product, onClose, onSave }) {
     price:         "",
     Product_stock: "",
     category:      "General",
+    description:   "",
+    weight:        "",
+    image_url:     "",
+    platforms:     "",
   });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
@@ -34,6 +38,10 @@ function ProductModal({ mode, product, onClose, onSave }) {
         price:         product.price         ?? "",
         Product_stock: product.Product_stock ?? "",
         category:      product.category      ?? "General",
+        description:   product.description   ?? "",
+        weight:        product.weight        ?? "",
+        image_url:     product.image_url     ?? "",
+        platforms:     (Array.isArray(product.platforms) ? product.platforms.join(",") : product.platforms) ?? "",
       });
     }
   }, [isEdit, product]);
@@ -73,14 +81,24 @@ function ProductModal({ mode, product, onClose, onSave }) {
       });
       if (!res.ok) throw new Error(`อัปเดตไม่สำเร็จ (${res.status})`);
     } else {
-      // เพิ่มสินค้าใหม่ (ยังใช้ endpoint เดิมไว้ก่อน)
-      const res = await fetch(`${BASE_URL}/products`, {
+      // เพิ่มสินค้าใหม่ใช้ /api/product/add
+      const platformsArray = form.platforms
+        .split(",")
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+      
+      const res = await fetch(`${BASE_URL}/product/add`, {
         method: "POST",
         headers: FETCH_HEADERS,
         body: JSON.stringify({
-          ...form,
-          Product_stock: Number(form.Product_stock),
-          price: form.price !== "" ? Number(form.price) : null,
+          name:        form.Product_name,
+          sku:         form.sku || undefined,
+          price:       form.price !== "" ? Number(form.price) : undefined,
+          stock:       Number(form.Product_stock),
+          description: form.description || undefined,
+          weight:      form.weight !== "" ? Number(form.weight) : undefined,
+          image_url:   form.image_url || undefined,
+          platforms:   platformsArray.length > 0 ? platformsArray : undefined,
         }),
       });
       if (!res.ok) throw new Error(`เพิ่มสินค้าไม่สำเร็จ (${res.status})`);
@@ -98,10 +116,14 @@ function ProductModal({ mode, product, onClose, onSave }) {
 
   const fields = [
     { key: "product_id",    label: "รหัสสินค้า",      type: "text",   placeholder: "PRD-001",  required: false },
-    { key: "sku",           label: "SKU",              type: "text",   placeholder: "SKU-001",  required: false },
-    { key: "Product_name",  label: "ชื่อสินค้า *",    type: "text",   placeholder: "ชื่อสินค้า", required: true },
-    { key: "price",         label: "ราคา (บาท)",      type: "number", placeholder: "0",        required: false },
-    { key: "Product_stock", label: "จำนวนสต็อก *",   type: "number", placeholder: "0",        required: true  },
+    { key: "sku",           label: "SKU",              type: "text",   placeholder: "CHAIR-BM-01",  required: false },
+    { key: "Product_name",  label: "ชื่อสินค้า *",    type: "text",   placeholder: "เก้าอี้เกมมิ่ง", required: true },
+    { key: "price",         label: "ราคา (บาท)",      type: "number", placeholder: "1590",        required: false },
+    { key: "Product_stock", label: "จำนวนสต็อก *",   type: "number", placeholder: "50",        required: true  },
+    { key: "description",   label: "รายละเอียด",      type: "text",   placeholder: "เก้าอี้นั่งสบาย...", required: false },
+    { key: "weight",        label: "น้ำหนัก (kg)",    type: "number", placeholder: "5.5",      required: false },
+    { key: "image_url",     label: "ลิงก์รูปภาพ",     type: "text",   placeholder: "https://example.com/chair.jpg", required: false },
+    { key: "platforms",     label: "แพลตฟอร์ม (คั่นด้วย comma)",    type: "text",   placeholder: "lazada,tiktok,shopee", required: false },
     { key: "category",      label: "หมวดหมู่",        type: "text",   placeholder: "General",  required: false },
   ];
 
@@ -201,7 +223,7 @@ export default function Stock() {
         setStockData(arr.map((item, i) => ({
           ...item,
           // field ที่ API ยังไม่มี ใส่ค่าเริ่มต้นไว้ก่อน
-          product_id: item.product_id ?? null,
+          
           sku:        item.sku        ?? null,
           price:      item.price      ?? null,
           _index: i,
@@ -336,7 +358,7 @@ export default function Stock() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        {["รหัสสินค้า", "SKU", "ชื่อสินค้า", "หมวดหมู่", "ราคา", "สต็อกรวม", "คงเหลือ", "จอง", "สถานะ", "การดำเนินการ"].map((h) => (
+                        {[ "SKU", "ชื่อสินค้า", "หมวดหมู่","platform", "ราคา", "สต็อกรวม", "คงเหลือ", "จอง", "สถานะ", "การดำเนินการ"].map((h) => (
                           <th key={h} className="text-left py-3 px-4 text-sm font-semibold text-gray-600 whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
@@ -344,12 +366,7 @@ export default function Stock() {
                     <tbody>
                       {filtered.map((item) => (
                         <tr key={item._index} className="border-b border-gray-100 hover:bg-gray-50">
-                          {/* รหัสสินค้า */}
-                          <td className="py-3 px-4 text-sm text-gray-600">
-                            {item.product_id
-                              ? <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded">{item.product_id}</span>
-                              : <span className="text-gray-300 text-xs">—</span>}
-                          </td>
+                          
                           {/* SKU */}
                           <td className="py-3 px-4 text-sm text-gray-600">
                             {item.sku
@@ -364,6 +381,12 @@ export default function Stock() {
                           <td className="py-3 px-4">
                             <span className="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium">
                               {item.category}
+                            </span>
+                          </td>
+                          {/* platform */}
+                          <td className="py-3 px-4">
+                            <span className="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium">
+                              {item.platform}
                             </span>
                           </td>
                           {/* ราคา */}

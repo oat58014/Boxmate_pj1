@@ -100,7 +100,7 @@ export default function Stat() {
                 </div>
               </div>
               <p className="text-gray-500 text-sm mt-2">
-                Leverage machine learning to anticipate market shifts and optimize your supply chain with high-precision demand forecasting.
+                เครื่องมือทำนายยอดขาย ที่คาดการณ์การเปลี่ยนแปลงของตลาดล่วงหน้า เพื่อช่วยให้คุณวางแผนการสตอกและการตลาดได้อย่างแม่นยำ
               </p>
             </div>
 
@@ -114,7 +114,7 @@ export default function Stat() {
               <div className="bg-white border border-gray-200 rounded-xl p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-gray-600 text-sm font-medium">PROJECTED REVENUE</p>
+                    <p className="text-gray-600 text-sm font-medium">คาดการณ์รายได้</p>
                   </div>
                   <div className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded">
                     <TrendingUp className="w-4 h-4 text-green-600" />
@@ -125,7 +125,7 @@ export default function Stat() {
                   ฿1,420,500
                 </p>
                 <p className="text-gray-600 text-xs">
-                  Estimated for the next 7 days based on seasonal trends.
+                  คาดการณ์ใน 7 วันข้างหน้าตามเหตุการณ์ต่าง ๆ
                 </p>
               </div>
 
@@ -133,35 +133,21 @@ export default function Stat() {
               <div className="bg-white border border-gray-200 rounded-xl p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-gray-600 text-sm font-medium">PROJECTED SALES VOLUME</p>
+                    <p className="text-gray-600 text-sm font-medium">ยอดขายที่คาดการณ์</p>
                   </div>
                   <BarChart3 className="w-5 h-5 text-gray-400" />
                 </div>
                 <p className="text-4xl font-bold text-gray-900 mb-2">
-                  8,240 <span className="text-2xl text-gray-600">Units</span>
+                  8,240 <span className="text-2xl text-gray-600">หน่วย</span>
                 </p>
                 <p className="text-gray-600 text-xs">
-                  Contribution rate and expected across distribution channels.
+                  อัตราการมีส่วนร่วมและคาดการณ์ 
                 </p>
               </div>
 
-              {/* Model Reliability */}
-              <div className="bg-[#1B00BF] rounded-xl p-6 text-white">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <p className="text-white/80 text-sm font-medium">MODEL RELIABILITY</p>
-                  </div>
-                  <CheckCircle className="w-5 h-5 text-white/60" />
-                </div>
-                <p className="text-5xl font-bold mb-2">92%</p>
-                <p className="text-white/80 text-xs">
-                  Confidence Score
-                </p>
-                <p className="text-white/70 text-xs mt-2">
-                  Based on 24 months of historical data and current market volatility indices.
-                </p>
-              </div>
-            </div>
+              
+              
+            </div> */
 
             {/* Sales Trend Analysis Chart */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8">
