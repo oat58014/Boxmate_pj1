@@ -8,16 +8,22 @@ import {
   Activity,
   Target,
   Zap,
+  Download,
 } from "lucide-react";
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import Navbar from "../navbar";
 import Header from "../main_header";
@@ -25,6 +31,7 @@ import { showToast } from "../../utils/toastNotification";
 
 export default function Analytics() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState("this");
 
   // API data state: initialise as null so UI shows null when absent
   const [dashboardData, setDashboardData] = useState(null);
@@ -74,7 +81,7 @@ export default function Analytics() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-50">
       {/* Navbar */}
       <Navbar
         isSidebarOpen={isSidebarOpen}
@@ -87,493 +94,324 @@ export default function Analytics() {
         <Header setIsSidebarOpen={setIsSidebarOpen} />
 
         {/* Analytics Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto">
-            {/* Page Header */}
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Analytics 📈
-              </h1>
-              <p className="text-gray-600">
-                วิเคราะห์และติดตามประสิทธิภาพการทำงาน
-              </p>
+            {/* Page Header with Export */}
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <p className="text-gray-500 text-sm font-medium mb-1">Dashboard &gt; Statistics</p>
+                <h1 className="text-4xl font-bold text-[#1B00BF] mb-2">
+                  Performance Overview
+                </h1>
+                <p className="text-gray-600">
+                  การติดตามประสิทธิภาพการขายและผู้ใช้งาน
+                </p>
+              </div>
+              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm font-medium">
+                <Download className="w-4 h-4" />
+                Export PDF
+              </button>
             </div>
 
-            {/* Performance Metrics (data from API; show null when absent) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              {/* Metric 1 */}
-              {(() => {
-                const metrics = dashboardData?.metrics;
-                const items = metrics || [
-                  {
-                    id: 1,
-                    icon: Target,
-                    title: "Conversion Rate",
-                    value: null,
-                    change: null,
-                  },
-                  {
-                    id: 2,
-                    icon: DollarSign,
-                    title: "Average Revenue",
-                    value: null,
-                    change: null,
-                  },
-                  {
-                    id: 3,
-                    icon: Activity,
-                    title: "Response Time",
-                    value: null,
-                    change: null,
-                  },
-                  {
-                    id: 4,
-                    icon: Zap,
-                    title: "Efficiency Score",
-                    value: null,
-                    change: null,
-                  },
-                ];
-                return items.map((m, i) => {
-                  const Icon = m.icon || Target;
-                  const change =
-                    m.change === undefined || m.change === null
-                      ? null
-                      : m.change;
-                  const changeNum = parseTrend(change);
-                  const changeUp = changeNum > 0;
-                  return (
-                    <div
-                      key={i}
-                      className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            {/* Performance Overview Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {/* Total Revenue */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
+                    <p className="text-gray-600 text-xs mt-1">เรารวมจำหน่ายรายได้ทั้งหมด</p>
+                  </div>
+                  <div className="bg-blue-100 p-3 rounded-lg">
+                    <DollarSign className="w-5 h-5 text-blue-600" />
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-2">
+                  ฿428,500
+                </p>
+                <div className="flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                  <span className="text-green-600 text-sm font-semibold">↑19.4%</span>
+                  <span className="text-gray-500 text-xs ml-1">from last month</span>
+                </div>
+              </div>
+
+              {/* Total Orders */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium">Total Orders</p>
+                    <p className="text-gray-600 text-xs mt-1">คำสั่งซื้อทั้งหมด</p>
+                  </div>
+                  <div className="bg-purple-100 p-3 rounded-lg">
+                    <Package className="w-5 h-5 text-purple-600" />
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-2">
+                  1,248
+                </p>
+                <div className="flex items-center gap-1">
+                  <TrendingDown className="w-4 h-4 text-red-600" />
+                  <span className="text-red-600 text-sm font-semibold">↓8.1%</span>
+                  <span className="text-gray-500 text-xs ml-1">from last month</span>
+                </div>
+              </div>
+
+              {/* Avg Order Value */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium">Avg Order Value</p>
+                    <p className="text-gray-600 text-xs mt-1">มูลค่าออเดอร์เฉลี่ย</p>
+                  </div>
+                  <div className="bg-orange-100 p-3 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-orange-600" />
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-2">
+                  ฿343.34
+                </p>
+                <div className="flex items-center gap-1">
+                  <TrendingDown className="w-4 h-4 text-red-600" />
+                  <span className="text-red-600 text-sm font-semibold">↓2.3%</span>
+                  <span className="text-gray-500 text-xs ml-1">from last month</span>
+                </div>
+              </div>
+
+              {/* New Customers */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium">New Customers</p>
+                    <p className="text-gray-600 text-xs mt-1">ลูกค้าใหม่</p>
+                  </div>
+                  <div className="bg-green-100 p-3 rounded-lg">
+                    <Users className="w-5 h-5 text-green-600" />
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-2">
+                  312
+                </p>
+                <div className="flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                  <span className="text-green-600 text-sm font-semibold">↑18.7%</span>
+                  <span className="text-gray-500 text-xs ml-1">from last month</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Daily Sales Performance - Large Chart */}
+              <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Daily Sales Performance
+                  </h2>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setSelectedMonth("this")}
+                      className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                        selectedMonth === "this"
+                          ? "text-[#1B00BF] bg-blue-100"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
                     >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="bg-blue-100 p-3 rounded-lg">
-                          <Icon className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <span
-                          className={`${changeNum >= 0 ? "text-green-600" : "text-red-600"} text-sm font-semibold flex items-center gap-1`}
-                        >
-                          {changeNum > 0 ? (
-                            <TrendingUp className="w-4 h-4" />
-                          ) : changeNum < 0 ? (
-                            <TrendingDown className="w-4 h-4" />
-                          ) : (
-                            <span className="w-4 h-4 inline-block" />
-                          )}
-                          {change === null || change === undefined
-                            ? "null"
-                            : String(change)}
-                        </span>
-                      </div>
-                      <p className="text-gray-500 text-sm font-medium">
-                        {m.title}
-                      </p>
-                      <p className="text-2xl font-bold text-gray-800 mt-1">
-                        {m.value === null || m.value === undefined
-                          ? "null"
-                          : m.value}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">
-                        เทียบกับเดือนที่แล้ว
-                      </p>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-
-            {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              {/* User Behavior Chart */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  พฤติกรรมผู้ใช้งาน
-                </h2>
-                <div className="space-y-4">
-                  {(() => {
-                    const ub = dashboardData?.userBehavior;
-                    const list = ub || [
-                      { label: "รับพัสดุ", value: null, color: "bg-blue-500" },
-                      {
-                        label: "ตรวจสอบสถานะ",
-                        value: null,
-                        color: "bg-green-500",
-                      },
-                      {
-                        label: "แจ้งปัญหา",
-                        value: null,
-                        color: "bg-yellow-500",
-                      },
-                      {
-                        label: "ติดต่อเจ้าหน้าที่",
-                        value: null,
-                        color: "bg-purple-500",
-                      },
-                    ];
-                    return list.map((item, index) => (
-                      <div key={index}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">
-                            {item.label}
-                          </span>
-                          <span className="text-sm font-semibold text-gray-800">
-                            {item.value === null || item.value === undefined
-                              ? "null"
-                              : `${item.value}%`}
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                      This Month
+                    </button>
+                    <button 
+                      onClick={() => setSelectedMonth("last")}
+                      className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                        selectedMonth === "last"
+                          ? "text-[#1B00BF] bg-blue-100"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      Last Month
+                    </button>
+                  </div>
+                </div>
+                <div className="h-80 bg-white rounded-lg border border-gray-100 p-4">
+                  {/* Daily Sales Performance Chart */}
+                  <div className="flex items-end justify-between w-full gap-2" style={{ height: '300px' }}>
+                    {(selectedMonth === "this"
+                      ? [
+                          { day: "Mon", sales: 45 },
+                          { day: "Tue", sales: 62 },
+                          { day: "Wed", sales: 58 },
+                          { day: "Thu", sales: 75 },
+                          { day: "Fri", sales: 88 },
+                          { day: "Sat", sales: 92 },
+                          { day: "Sun", sales: 68 },
+                        ]
+                      : [
+                          { day: "Mon", sales: 38 },
+                          { day: "Tue", sales: 52 },
+                          { day: "Wed", sales: 48 },
+                          { day: "Thu", sales: 65 },
+                          { day: "Fri", sales: 78 },
+                          { day: "Sat", sales: 82 },
+                          { day: "Sun", sales: 58 },
+                        ]
+                    ).map((item, idx) => (
+                      <div key={idx} className="flex flex-col items-center flex-1">
+                        <div className="flex gap-1 items-end justify-center h-full w-full">
                           <div
-                            className={`${item.color} h-2 rounded-full transition-all`}
-                            style={{
-                              width: `${item.value === null || item.value === undefined ? 0 : item.value}%`,
-                            }}
+                            className="flex-1 rounded-t bg-[#1B00BF]"
+                            style={{ height: `${(item.sales / 100) * 250}px` }}
+                            title={`Sales: ${item.sales}%`}
                           ></div>
                         </div>
+                        <span className="text-xs font-semibold text-gray-600 mt-3">
+                          {item.day}
+                        </span>
                       </div>
-                    ));
-                  })()}
-                </div>
-              </div>
-
-              {/* Traffic Sources */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  แหล่งที่มาของผู้ใช้
-                </h2>
-                <div className="space-y-4">
-                  {(() => {
-                    const ts = dashboardData?.trafficSources;
-                    const list = ts || [
-                      {
-                        source: "Direct",
-                        users: null,
-                        percentage: null,
-                        trend: null,
-                      },
-                      {
-                        source: "Social Media",
-                        users: null,
-                        percentage: null,
-                        trend: null,
-                      },
-                      {
-                        source: "Email",
-                        users: null,
-                        percentage: null,
-                        trend: null,
-                      },
-                      {
-                        source: "Referral",
-                        users: null,
-                        percentage: null,
-                        trend: null,
-                      },
-                    ];
-                    return list.map((item, index) => {
-                      const trendNum = parseTrend(item.trend);
-                      const trendUp = trendNum > 0;
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-800">
-                              {item.source}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {item.users === null || item.users === undefined
-                                ? "null"
-                                : `${item.users} users`}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-gray-800">
-                                {item.percentage === null ||
-                                item.percentage === undefined
-                                  ? "null"
-                                  : `${item.percentage}%`}
-                              </p>
-                              <p
-                                className={`text-xs font-medium ${trendUp ? "text-green-600" : "text-red-600"}`}
-                              >
-                                {item.trend === null || item.trend === undefined
-                                  ? "0"
-                                  : String(item.trend)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-            </div>
-
-            {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              {/* Top Performers */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  Top Performers
-                </h2>
-                <div className="space-y-3">
-                  {(() => {
-                    const tp = dashboardData?.topPerformers;
-                    const list = tp || [
-                      { name: null, score: null, packages: null },
-                      { name: null, score: null, packages: null },
-                      { name: null, score: null, packages: null },
-                      { name: null, score: null, packages: null },
-                    ];
-                    return list.map((person, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div className="w-8 h-8 bg-[#1B00BF] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {index + 1}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-800">
-                            {person.name === null || person.name === undefined
-                              ? "null"
-                              : person.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {person.packages === null ||
-                            person.packages === undefined
-                              ? "null"
-                              : `${person.packages} packages`}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-[#1B00BF]">
-                            {person.score === null || person.score === undefined
-                              ? "null"
-                              : person.score}
-                          </p>
-                          <p className="text-xs text-gray-500">score</p>
-                        </div>
-                      </div>
-                    ));
-                  })()}
-                </div>
-              </div>
-
-              {/* Package Distribution */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  การกระจายพัสดุ
-                </h2>
-                <div className="space-y-3">
-                  {(() => {
-                    const pd = dashboardData?.packageDistribution;
-                    const list = pd || [
-                      { type: "Express", count: null, color: "bg-red-500" },
-                      { type: "Standard", count: null, color: "bg-blue-500" },
-                      { type: "Economy", count: null, color: "bg-green-500" },
-                      {
-                        type: "International",
-                        count: null,
-                        color: "bg-purple-500",
-                      },
-                    ];
-                    return list.map((item, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <div
-                          className={`w-3 h-3 ${item.color} rounded-full`}
-                        ></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-700">
-                            {item.type}
-                          </p>
-                        </div>
-                        <p className="text-sm font-bold text-gray-800">
-                          {item.count === null || item.count === undefined
-                            ? "null"
-                            : item.count}
-                        </p>
-                      </div>
-                    ));
-                  })()}
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-700">
-                      Total
-                    </span>
-                    <span className="text-lg font-bold text-gray-800">
-                      {dashboardData?.packageDistributionTotal ?? "null"}
-                    </span>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* Customer Satisfaction */}
+              {/* Revenue by Category */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  ความพึงพอใจ
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Revenue by Category
                 </h2>
-                <div className="flex flex-col items-center justify-center py-4">
-                  <div className="relative w-32 h-32">
-                    <svg className="w-full h-full" viewBox="0 0 100 100">
-                      <circle
-                        className="text-gray-200 stroke-current"
-                        strokeWidth="10"
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="transparent"
-                      ></circle>
-                      <circle
-                        className="text-green-500 stroke-current"
-                        strokeWidth="10"
-                        strokeLinecap="round"
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="transparent"
-                        strokeDasharray="251.2"
-                        strokeDashoffset="50.24"
-                        transform="rotate(-90 50 50)"
-                      ></circle>
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-gray-800">
-                        {dashboardData?.satisfaction?.rating ?? "null"}
-                      </span>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Electronics</span>
+                      <span className="text-sm font-bold text-gray-900">45%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-[#1B00BF] h-2 rounded-full" style={{ width: "45%" }}></div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-4">จาก 5 คะแนน</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {dashboardData?.satisfaction?.reviews ?? "null"} reviews
-                  </p>
-                </div>
-                <div className="mt-4 space-y-2">
-                  {(
-                    dashboardData?.satisfaction?.breakdown ?? [
-                      null,
-                      null,
-                      null,
-                      null,
-                      null,
-                    ]
-                  ).map((pct, idx) => {
-                    const star = 5 - idx;
-                    const width = pct === null || pct === undefined ? 0 : pct;
-                    const label =
-                      pct === null || pct === undefined ? "null" : `${pct}%`;
-                    return (
-                      <div key={star} className="flex items-center gap-2">
-                        <span className="text-xs text-gray-600 w-8">
-                          {star} ⭐
-                        </span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-yellow-400 h-2 rounded-full"
-                            style={{ width: `${width}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-gray-600 w-10 text-right">
-                          {label}
-                        </span>
-                      </div>
-                    );
-                  })}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Fashion & Apparel</span>
+                      <span className="text-sm font-bold text-gray-900">30%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-purple-500 h-2 rounded-full" style={{ width: "30%" }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Home & Living</span>
+                      <span className="text-sm font-bold text-gray-900">15%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-orange-500 h-2 rounded-full" style={{ width: "15%" }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Beauty & Personal Care</span>
+                      <span className="text-sm font-bold text-gray-900">10%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-pink-500 h-2 rounded-full" style={{ width: "10%" }}></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Trends Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
-                แนวโน้มรายสัปดาห์
+            {/* Best Selling Products */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                Best Selling Products
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        สัปดาห์
+                        PRODUCT NAME
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        พัสดุรับ
+                        CATEGORY
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        ผู้ใช้ใหม่
+                        SALES VOLUME
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        ประสิทธิภาพ
+                        UNIT PRICE
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">
-                        เทรนด์
+                        TOTAL REVENUE
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {(
-                      dashboardData?.weeklyTrends ?? [null, null, null, null]
-                    ).map((item, index) => {
-                      const row = item || {
-                        week: null,
-                        packages: null,
-                        users: null,
-                        efficiency: null,
-                        trend: null,
-                      };
-                      // trend default to 0 per request; if trend is 'up'/'down' convert to numeric sign
-                      const trendRaw = row.trend;
-                      let trendVal = 0;
-                      if (trendRaw === "up") trendVal = 1;
-                      else if (trendRaw === "down") trendVal = -1;
-                      else if (typeof trendRaw === "number")
-                        trendVal = trendRaw;
-                      else trendVal = parseTrend(trendRaw);
-                      return (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-100 hover:bg-gray-50"
-                        >
-                          <td className="py-3 px-4 text-sm font-medium text-gray-800">
-                            {row.week === null || row.week === undefined
-                              ? "null"
-                              : row.week}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-gray-600">
-                            {row.packages === null || row.packages === undefined
-                              ? "null"
-                              : row.packages}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-gray-600">
-                            {row.users === null || row.users === undefined
-                              ? "null"
-                              : row.users}
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                              {row.efficiency === null ||
-                              row.efficiency === undefined
-                                ? "null"
-                                : `${row.efficiency}%`}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            {trendVal > 0 ? (
-                              <TrendingUp className="w-5 h-5 text-green-500" />
-                            ) : trendVal < 0 ? (
-                              <TrendingDown className="w-5 h-5 text-red-500" />
-                            ) : (
-                              <span className="text-xs text-gray-500">0</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    <tr className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900">
+                        Wireless Headphones Pro
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        Electronics
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        324 units
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        ฿2,499
+                      </td>
+                      <td className="py-4 px-4 text-sm font-bold text-gray-900">
+                        ฿809,676
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900">
+                        Premium T-Shirt Bundle
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        Fashion & Apparel
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        512 units
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        ฿599
+                      </td>
+                      <td className="py-4 px-4 text-sm font-bold text-gray-900">
+                        ฿306,688
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900">
+                        Smart LED Bulb Set
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        Home & Living
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        289 units
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        ฿1,299
+                      </td>
+                      <td className="py-4 px-4 text-sm font-bold text-gray-900">
+                        ฿375,411
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900">
+                        Organic Skincare Kit
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        Beauty & Personal Care
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        198 units
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        ฿899
+                      </td>
+                      <td className="py-4 px-4 text-sm font-bold text-gray-900">
+                        ฿178,002
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

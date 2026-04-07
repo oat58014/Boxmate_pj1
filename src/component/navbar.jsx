@@ -28,13 +28,13 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
       label: "Dashboard",
       hasSubmenu: true,
       submenu: [
-        { icon: BarChart3, label: "Statistics", path: "/dashboard/stats" },
-        { icon: PieChart, label: "Analytics", path: "/dashboard/analytics" },
+        { icon: BarChart3, label: "Statistics", path: "/dashboard/analytics" },
+        { icon: PieChart, label: "Analytics", path: "/dashboard/stats " },
       ],
     },
     {
       icon: Package,
-      label: "พัสดุ",
+      label: "Catalog",
       hasSubmenu: true,
       submenu: [
         { icon: Box, label: "Stock", path: "/packages/stock" },
@@ -42,7 +42,7 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
       ],
     },
     { icon: Users, label: "ผู้ใช้งาน", path: "/users" },
-    { icon: Settings, label: "ตั้งค่า", path: "/settings" },
+    // { icon: Settings, label: "ตั้งค่า", path: "/settings" },
   ];
 
   const handleSubmenuToggle = (label) => {

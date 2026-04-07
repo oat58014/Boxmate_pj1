@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Package, Users, TrendingUp, AlertCircle } from "lucide-react";
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -15,6 +18,7 @@ import Header from "./main_header";
 import { showToast } from "../utils/toastNotification";
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,102 +76,109 @@ export default function MainPage() {
           <div className="max-w-7xl mx-auto">
             {/* Welcome Section */}
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                ยินดีต้อนรับ! 👋
+              <p className="text-gray-500 text-sm font-medium mb-1">Home</p>
+              <h1 className="text-4xl font-bold">
+                <span className="text-black">WELCOME!</span>{" "}
+                <span className="text-[#1B00BF]">BOONTHAVORN</span>
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mt-2">
                 จัดการพัสดุและข้อมูลของคุณได้ที่นี่
               </p>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm font-medium">
-                      คำสั่งซื้อทั้งหมด
+            {/* Stats Cards with New Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 lg:h-96">
+              {/* Left: Sales Chart - 7 days */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 relative">
+                <div className="flex items-start justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-800">
+                    ยอดขาย
+                  </h2>
+                  <div className="text-right">
+                    <p className="text-gray-500 text-sm">ยอดขายวันนี้</p>
+                    <p className="text-2xl font-bold text-[#1B00BF]">
+                      ฿{(apiData?.data_stat && apiData.data_stat.length > 0 
+                        ? apiData.data_stat[apiData.data_stat.length - 1].totalSales 
+                        : 0).toLocaleString("th-TH")}
                     </p>
-                    <p className="text-2xl font-bold text-gray-800 mt-1">
-                      {apiData?.data?.Total_orders || 0}
-                    </p>
-                  </div>
-                  <div className="bg-blue-100 p-3 rounded-lg">
-                    <Package className="w-6 h-6 text-blue-600" />
                   </div>
                 </div>
+                {apiData?.data_stat && apiData.data_stat.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart
+                      data={apiData.data_stat.slice(-7).map((item, index) => ({
+                        ...item,
+                        isToday: index === apiData.data_stat.slice(-7).length - 1,
+                      }))}
+                      margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value) =>
+                          `฿${Number(value).toLocaleString("th-TH")}`
+                        }
+                      />
+                      <Bar
+                        dataKey="totalSales"
+                        fill="#1B00BF"
+                        name="ยอดขาย"
+                        shape={({ x, y, width, height, fill, payload }) => {
+                          const barFill = payload.isToday ? "#1B00BF" : "#ADD8E6";
+                          return (
+                            <rect
+                              x={x}
+                              y={y}
+                              width={width}
+                              height={height}
+                              fill={barFill}
+                            />
+                          );
+                        }}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-64 flex items-center justify-center">
+                    <p className="text-gray-500">ไม่มีข้อมูลกราฟ</p>
+                  </div>
+                )}
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm font-medium">
-                      คำสั่งจาก Lazada
-                    </p>
-                    <p className="text-2xl font-bold text-gray-800 mt-1">
-                      {apiData?.data?.Lazada_orders || 0}
-                    </p>
+              {/* Right: Stacked Cards */}
+              <div className="flex flex-col gap-3">
+                {/* Lazada - Top Card */}
+                <div className="flex-1 bg-[#1B00BF] rounded-xl shadow-sm p-6 border border-gray-200 text-white relative flex flex-col">
+                  <div className="absolute top-6 right-6 bg-white/20 p-3 rounded-lg">
+                    <Package className="w-6 h-6 text-white" />
                   </div>
-                  <div className="bg-yellow-100 p-3 rounded-lg">
-                    <Package className="w-6 h-6 text-yellow-600" />
-                  </div>
+                  <p className="text-white/70 text-sm font-medium">
+                    ยอดขาย Lazada
+                  </p>
+                  <p className="text-3xl font-bold text-white mt-auto">
+                    {apiData?.data?.Lazada_orders || 0}
+                  </p>
                 </div>
-              </div>
 
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm font-medium">
-                      คำสั่งจาก TikTok
-                    </p>
-                    <p className="text-2xl font-bold text-gray-800 mt-1">
-                      {apiData?.data?.Tiktok_orders || 0}
-                    </p>
+                {/* TikTok - Bottom Card */}
+                <div className="flex-1 bg-black rounded-xl shadow-sm p-6 border border-gray-200 text-white relative flex flex-col">
+                  <div className="absolute top-6 right-6 bg-white/20 p-3 rounded-lg">
+                    <Package className="w-6 h-6 text-white" />
                   </div>
-                  <div className="bg-pink-100 p-3 rounded-lg">
-                    <Package className="w-6 h-6 text-pink-600" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm font-medium">
-                      รอดำเนินการ
-                    </p>
-                    <p className="text-2xl font-bold text-gray-800 mt-1">
-                      {apiData?.data?.Pending_orders || 0}
-                    </p>
-                  </div>
-                  <div className="bg-orange-100 p-3 rounded-lg">
-                    <AlertCircle className="w-6 h-6 text-orange-600" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 text-sm font-medium">
-                      ยอดขายรวม
-                    </p>
-                    <p className="text-2xl font-bold text-gray-800 mt-1">
-                      ฿{(apiData?.data?.Revenue || 0).toLocaleString("th-TH", {
-                        maximumFractionDigits: 0,
-                      })}
-                    </p>
-                  </div>
-                  <div className="bg-green-100 p-3 rounded-lg">
-                    <TrendingUp className="w-6 h-6 text-green-600" />
-                  </div>
+                  <p className="text-white/70 text-sm font-medium">
+                    ยอดขาย TikTok
+                  </p>
+                  <p className="text-3xl font-bold text-white mt-auto">
+                    {apiData?.data?.Tiktok_orders || 0}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/packages/order")}>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                   กิจกรรมล่าสุด
                 </h2>
@@ -218,40 +229,39 @@ export default function MainPage() {
                 </div>
               </div>
 
-              {/* Sales Chart */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  ยอดขายรายวัน
+              {/* Low Stock Products */}
+              <div className="bg-red-50 rounded-xl shadow-sm border border-red-200 p-6 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/packages/stock")}>
+                <h2 className="text-xl font-bold text-red-700 mb-4">
+                  สินค้าใกล้หมด
                 </h2>
-                {apiData?.data_stat && apiData.data_stat.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart
-                      data={apiData.data_stat.slice(-10).reverse()}
-                      margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value) =>
-                          `฿${Number(value).toLocaleString("th-TH")}`
-                        }
-                      />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="totalSales"
-                        stroke="#1B00BF"
-                        strokeWidth={2}
-                        dot={{ fill: "#1B00BF" }}
-                        activeDot={{ r: 6 }}
-                        name="ยอดขาย"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-gray-500 text-center">ไม่มีข้อมูลกราฟ</p>
-                )}
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {loading && <p className="text-red-600">กำลังโหลด...</p>}
+                  {error && (
+                    <p className="text-red-600">เกิดข้อผิดพลาด: {error}</p>
+                  )}
+                  {apiData?.LowStockProducts && apiData.LowStockProducts.length > 0 ? (
+                    apiData.LowStockProducts.slice(0, 5).map((product, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 p-3 bg-red-100/50 rounded-lg border border-red-200"
+                      >
+                        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <AlertCircle className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-red-900 truncate text-sm">
+                            {product.Product_name}
+                          </p>
+                          <p className="text-xs text-red-700">
+                            เหลือ: {product.stock_remaining} ชิ้น
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-red-600 text-sm text-center py-4">ไม่มีสินค้าใกล้หมด</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

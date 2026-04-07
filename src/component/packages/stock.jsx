@@ -66,6 +66,7 @@ function ProductModal({ mode, product, onClose, onSave }) {
         method: "POST",
         headers: FETCH_HEADERS,
         body: JSON.stringify({
+          "ngrok-skip-browser-warning" : "69420",
           sku:       form.sku,
           new_stock: Number(form.Product_stock),
         }),
@@ -275,8 +276,9 @@ export default function Stock() {
           <div className="max-w-7xl mx-auto">
 
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Stock Management 📦</h1>
-              <p className="text-gray-600">จัดการสินค้าในสต็อก</p>
+              <p className="text-gray-500 text-sm font-medium mb-1">Catalog &gt; Stock Management</p>
+              <h1 className="text-4xl font-bold text-[#1B00BF]">Stock Master</h1>
+              <p className="text-gray-600 mt-2">Manage your product ecosystem. Real-time insights into availability and asset valuation</p>
             </div>
 
             {/* Summary Cards */}

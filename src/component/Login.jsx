@@ -130,32 +130,34 @@ export default function Login() {
       </div>
 
       {/* WEB-APP (Desktop)*/}
-      <div className="hidden md:flex md:flex-col md:items-center md:justify-center relative h-screen overflow-hidden bg-gradient-to-r from-[#1B00BF] via-gray-900 to-black">
-        {/* Logo */}
-        <div className="absolute left-20 top-1/2 transform -translate-y-1/2">
-          <img className="w-64 h-auto" src={Logo} alt="Boxmate Logo" />
-        </div>
+      <div className="hidden md:flex items-center justify-center h-screen overflow-hidden">
+        {/* Main Container with white background box */}
+        <div className="flex w-4/5 max-w-6xl h-4/5 rounded-2xl shadow-2xl overflow-hidden">
+          
+          {/* Left Side - Blue Background with Logo */}
+          <div className="w-1/2 bg-[#1B00BF] flex flex-col items-center justify-center p-8">
+            <img className="w-64 h-auto" src={Logo} alt="Boxmate Logo" />
+          </div>
 
-        {/* LOGIN FORM (Desktop)*/}
-        <div className="absolute inset-0 z-10 flex items-center justify-end pr-32">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 w-full max-w-md border border-white/20 shadow-2xl">
-            <h2 className="text-white text-3xl font-bold mb-2 text-center">
+          {/* Right Side - White Background with Login Form */}
+          <div className="w-1/2 bg-white flex flex-col items-center justify-center p-12">
+            <h2 className="text-[#1B00BF] text-3xl font-bold mb-2 text-center">
               Sign In
             </h2>
-            <p className="text-white/70 text-sm mb-6 text-center">
+            <p className="text-gray-600 text-sm mb-6 text-center">
               เข้าสู่ระบบของคุณ
             </p>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg">
-                <p className="text-red-400 text-sm">{error}</p>
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 rounded-lg w-full">
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <form className="space-y-5 w-full" onSubmit={handleSubmit}>
               {/* Email */}
               <div>
-                <label className="text-white text-sm font-medium block mb-2">
+                <label className="text-gray-700 text-sm font-medium block mb-2">
                   อีเมล
                 </label>
                 <input
@@ -163,8 +165,8 @@ export default function Login() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30
-                           text-white placeholder-white/50 focus:outline-none focus:ring-2
+                  className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300
+                           text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2
                            focus:ring-[#1B00BF] focus:border-transparent transition"
                   placeholder="example@email.com"
                 />
@@ -172,7 +174,7 @@ export default function Login() {
 
               {/* Password */}
               <div>
-                <label className="text-white text-sm font-medium block mb-2">
+                <label className="text-gray-700 text-sm font-medium block mb-2">
                   รหัสผ่าน
                 </label>
                 <input
@@ -180,8 +182,8 @@ export default function Login() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30
-                           text-white placeholder-white/50 focus:outline-none focus:ring-2
+                  className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300
+                           text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2
                            focus:ring-[#1B00BF] focus:border-transparent transition"
                   placeholder="กรอกรหัสผ่าน"
                 />
@@ -198,7 +200,7 @@ export default function Login() {
               </button>
 
               {/* Register Link */}
-              <p className="text-white/70 text-sm text-center mt-4">
+              <p className="text-gray-600 text-sm text-center mt-4">
                 ยังไม่มีบัญชี?{" "}
                 <a href="/register" className="text-[#1B00BF] hover:text-[#1500a0] font-semibold">
                   สร้างบัญชี

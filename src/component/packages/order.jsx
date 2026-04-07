@@ -17,13 +17,21 @@ export default function Order() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [selectedTimeframe, setSelectedTimeframe] = useState("7");
+
   const statusFilters = [
-    { id: "all", label: "ทั้งหมด" },
-    { id: "cancelled", label: "ยกเลิก" },
-    { id: "pending", label: "รอดำเนินการ" },
-    { id: "processing", label: "กำลังดำเนินการ" },
-    { id: "shipping", label: "กำลังจัดส่ง" },
-    { id: "completed", label: "สำเร็จ" },
+    { id: "all", label: "every orders" },
+    { id: "cancelled", label: "canceled" },
+    { id: "pending", label: "pending" },
+    { id: "processing", label: "on going" },
+    { id: "shipping", label: "shipping" },
+    { id: "completed", label: "complete" },
+  ];
+
+  const timeframeOptions = [
+    { value: "7", label: "7 วัน" },
+    { value: "15", label: "15 วัน" },
+    { value: "30", label: "30 วัน" },
   ];
 
   // stock/order data — will be populated from API; keep an empty array initially
@@ -141,7 +149,7 @@ export default function Order() {
   const statusOrder = {
     cancelled: 1,
     pending: 2,
-    processing: 3,
+    processing: 3,  
     shipping: 4,
     completed: 5,
   };
@@ -230,10 +238,9 @@ export default function Order() {
           <div className="max-w-7xl mx-auto">
             {/* Page Header */}
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Order Management 🛒
-              </h1>
-              <p className="text-gray-600">จัดการคำสั่งซื้อทั้งหมด</p>
+              <p className="text-gray-500 text-sm font-medium mb-1">Catalog &gt; Order Management</p>
+              <h1 className="text-4xl font-bold text-[#1B00BF]">Orders</h1>
+              <p className="text-gray-600 mt-2">Manage every Orders from every platform</p>
             </div>
 
             {/* Summary Cards */}
@@ -241,7 +248,7 @@ export default function Order() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">ทั้งหมด</p>
+                    <p className="text-gray-500 text-sm font-medium">every orders</p>
                     <p className="text-2xl font-bold text-gray-800 mt-1">
                       {orderSummary.total}
                     </p>
@@ -255,7 +262,7 @@ export default function Order() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">รอ</p>
+                    <p className="text-gray-500 text-sm font-medium">pending</p>
                     <p className="text-2xl font-bold text-gray-800 mt-1">
                       {orderSummary.pending}
                     </p>
@@ -269,9 +276,7 @@ export default function Order() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">
-                      ดำเนินการ
-                    </p>
+                    <p className="text-gray-500 text-sm font-medium">on going</p>
                     <p className="text-2xl font-bold text-gray-800 mt-1">
                       {orderSummary.processing}
                     </p>
@@ -285,7 +290,7 @@ export default function Order() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">จัดส่ง</p>
+                    <p className="text-gray-500 text-sm font-medium">shipping</p>
                     <p className="text-2xl font-bold text-gray-800 mt-1">
                       {orderSummary.shipping}
                     </p>
@@ -299,7 +304,7 @@ export default function Order() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">สำเร็จ</p>
+                    <p className="text-gray-500 text-sm font-medium">complete</p>
                     <p className="text-2xl font-bold text-gray-800 mt-1">
                       {orderSummary.completed}
                     </p>
@@ -311,38 +316,53 @@ export default function Order() {
               </div>
             </div>
 
-            {/* Filter & Search Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                {/* Search */}
-                <div className="flex-1 w-full md:max-w-md">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder="ค้นหาคำสั่งซื้อ..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg
-                               focus:outline-none focus:ring-2 focus:ring-[#1B00BF] focus:border-transparent"
-                    />
+            {/* Filter Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+              <div className="flex flex-col md:flex-row gap-0 items-start md:items-center">
+                {/* Status Filter */}
+                <div className="flex-1 px-6 py-4 border-b md:border-b-0 md:border-r border-gray-200">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <label className="text-sm font-medium text-gray-700 uppercase whitespace-nowrap">
+                      Status:
+                    </label>
+                    <div className="flex gap-2">
+                      {statusFilters.map((filter) => (
+                        <button
+                          key={filter.id}
+                          onClick={() => setSelectedStatus(filter.id)}
+                          className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                            selectedStatus === filter.id
+                              ? "bg-[#1B00BF] text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Status Filters */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {statusFilters.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setSelectedStatus(filter.id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedStatus === filter.id
-                        ? "bg-[#1B00BF] text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
+                {/* Timeframe Filter */}
+                <div className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-gray-700 uppercase whitespace-nowrap">
+                      Timeframe:
+                    </label>
+                    <select
+                      value={selectedTimeframe}
+                      onChange={(e) => setSelectedTimeframe(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded text-sm
+                               focus:outline-none focus:ring-2 focus:ring-[#1B00BF] focus:border-transparent"
+                    >
+                      {timeframeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 
